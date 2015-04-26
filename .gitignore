@@ -1,0 +1,5 @@
+/database-examples/
+simplelogger.properties
+nb-configuration.xml
+database.xml
+/database-h2/target/
