@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -120,7 +121,10 @@ public class JDBCLink implements Link {
                 for (int i = 0; i < columnCount; i++) {
                     String columnName = metaData.getColumnLabel(i + 1);
                     Object columnValue = resultSet.getObject(i + 1);
-                    Object javaObject = this.toJavaObject(columnValue, transform);
+                    Object javaObject = columnValue;
+                    if (null != transform) {
+                        javaObject = this.toJavaObject(columnValue, transform);
+                    }
                     result.set(columnName.toLowerCase(), javaObject);
                 }
                 listResults.attach(result);
@@ -159,15 +163,17 @@ public class JDBCLink implements Link {
 
     protected Affecting execute(String sql, Bindings bindings, Transform transform) {
         PreparedStatement statement = this.preparedStatement(sql, true);
-        Object[] values = bindings.getArray(new String[]{"values"});
-        if (null != transform) {
-            for (int i = 0; i < values.length; i++) {
-                values[i] = this.toDatabaseObject(values[i], transform);
+        if (null != bindings) {
+            Object[] values = bindings.getArray(new String[]{"values"});
+            if (null != transform) {
+                for (int i = 0; i < values.length; i++) {
+                    values[i] = this.toDatabaseObject(values[i], transform);
+                }
             }
+            Object[] wheres = bindings.getArray(new String[]{"wheres"});
+            this.setBindings(statement, values, 1);
+            this.setBindings(statement, wheres, values.length + 1);
         }
-        Object[] wheres = bindings.getArray(new String[]{"wheres"});
-        this.setBindings(statement, values, 1);
-        this.setBindings(statement, wheres, values.length + 1);
         int affectingCount;
         ResultSet resultSet;
         try {
@@ -185,8 +191,10 @@ public class JDBCLink implements Link {
     @Override
     public RowList select(String sql, Bindings bindings, Transform transform) {
         PreparedStatement statement = this.preparedStatement(sql, false);
-        Object[] wheresAndHavings = bindings.getArray(new String[]{"wheres", "havings"});
-        this.setBindings(statement, wheresAndHavings, 1);
+        if (null != bindings) {
+            Object[] wheresAndHavings = bindings.getArray(new String[]{"wheres", "havings"});
+            this.setBindings(statement, wheresAndHavings, 1);
+        }
         ResultSet resultSet;
         try {
             resultSet = statement.executeQuery();
@@ -227,6 +235,19 @@ public class JDBCLink implements Link {
     @Override
     public void drop(String sql) {
         this.executeDDL(sql);
+    }
+
+    @Override
+    public boolean exists(String tableName) {
+        boolean exists = false;
+        try {
+            DatabaseMetaData databaseMetaData = this.connection.getMetaData();
+            ResultSet tables = databaseMetaData.getTables(null, null, tableName.toUpperCase(), null);
+            exists = tables.next();
+        } catch (SQLException ex) {
+            throw new QueryException("Can't get database metadata", ex);
+        }
+        return exists;
     }
 
     protected Object toDatabaseObject(Object object, Transform transform) {

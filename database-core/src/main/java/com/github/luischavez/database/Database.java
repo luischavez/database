@@ -106,6 +106,10 @@ public class Database {
         this.schema(blueprint);
     }
 
+    public boolean exists(String tableName) {
+        return this.link.exists(tableName);
+    }
+
     public void drop(String tableName) {
         Blueprint blueprint = new Blueprint(SQLType.DROP, tableName);
         this.schema(blueprint);

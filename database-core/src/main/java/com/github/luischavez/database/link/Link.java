@@ -37,4 +37,6 @@ public interface Link {
     public void alter(String sql);
 
     public void drop(String sql);
+
+    public boolean exists(String tableName);
 }
