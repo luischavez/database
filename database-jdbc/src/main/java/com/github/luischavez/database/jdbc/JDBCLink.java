@@ -244,6 +244,7 @@ public class JDBCLink implements Link {
             DatabaseMetaData databaseMetaData = this.connection.getMetaData();
             ResultSet tables = databaseMetaData.getTables(null, null, tableName.toUpperCase(), null);
             exists = tables.next();
+            this.close(tables);
         } catch (SQLException ex) {
             throw new QueryException("Can't get database metadata", ex);
         }
