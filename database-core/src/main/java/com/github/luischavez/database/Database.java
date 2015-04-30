@@ -25,9 +25,12 @@ import com.github.luischavez.database.grammar.Grammar;
 import com.github.luischavez.database.grammar.SQLType;
 import com.github.luischavez.database.handler.DefaultHandler;
 import com.github.luischavez.database.handler.Handler;
+import com.github.luischavez.database.link.Affecting;
 import com.github.luischavez.database.link.Link;
 import com.github.luischavez.database.link.Transform;
 import com.github.luischavez.database.query.Query;
+import com.github.luischavez.database.query.Queryable;
+import com.github.luischavez.database.query.component.JoinComponent;
 import com.github.luischavez.database.schema.Blueprint;
 
 import java.util.ArrayList;
@@ -37,7 +40,7 @@ import java.util.List;
  *
  * @author Luis Chávez <https://github.com/luischavez>
  */
-public class Database {
+public class Database implements Queryable<Query> {
 
     private static final List<Database> DATABASES = new ArrayList<>();
 
@@ -94,6 +97,14 @@ public class Database {
         return this.query().from(tableName);
     }
 
+    public Affecting insert(String tableName, String columns, Object... values) {
+        return this.query().insert(tableName, columns, new Object[][]{values});
+    }
+
+    public Affecting insert(String tableName, String columns, Object[][] values) {
+        return this.query().insert(tableName, columns, values);
+    }
+
     public void create(String tableName, Fluentable<Blueprint> fluentable) {
         Blueprint blueprint = new Blueprint(SQLType.CREATE, tableName);
         fluentable.fluent(blueprint);
@@ -113,6 +124,106 @@ public class Database {
     public void drop(String tableName) {
         Blueprint blueprint = new Blueprint(SQLType.DROP, tableName);
         this.schema(blueprint);
+    }
+
+    @Override
+    public Query distinct(boolean onlyDistinctResults) {
+        return this.query().distinct(onlyDistinctResults);
+    }
+
+    @Override
+    public Query column(String columnName) {
+        return this.query().column(columnName);
+    }
+
+    @Override
+    public Query join(String tableName, String firstColumn, String operator, String secondColumn) {
+        return this.query().join(tableName, firstColumn, operator, secondColumn);
+    }
+
+    @Override
+    public Query join(String tableName, Fluentable<JoinComponent> fluentable) {
+        return this.query().join(tableName, fluentable);
+    }
+
+    @Override
+    public Query naturalJoin(String tableName, String firstColumn, String operator, String secondColumn) {
+        return this.query().naturalJoin(tableName, firstColumn, operator, secondColumn);
+    }
+
+    @Override
+    public Query naturalJoin(String tableName, Fluentable<JoinComponent> fluentable) {
+        return this.query().naturalJoin(tableName, fluentable);
+    }
+
+    @Override
+    public Query leftJoin(String tableName, String firstColumn, String operator, String secondColumn) {
+        return this.query().leftJoin(tableName, firstColumn, operator, secondColumn);
+    }
+
+    @Override
+    public Query leftJoin(String tableName, Fluentable<JoinComponent> fluentable) {
+        return this.query().leftJoin(tableName, fluentable);
+    }
+
+    @Override
+    public Query rightJoin(String tableName, String firstColumn, String operator, String secondColumn) {
+        return this.query().rightJoin(tableName, firstColumn, operator, secondColumn);
+    }
+
+    @Override
+    public Query rightJoin(String tableName, Fluentable<JoinComponent> fluentable) {
+        return this.query().rightJoin(tableName, fluentable);
+    }
+
+    @Override
+    public Query fullJoin(String tableName, String firstColumn, String operator, String secondColumn) {
+        return this.query().fullJoin(tableName, firstColumn, operator, secondColumn);
+    }
+
+    @Override
+    public Query fullJoin(String tableName, Fluentable<JoinComponent> fluentable) {
+        return this.query().fullJoin(tableName, fluentable);
+    }
+
+    @Override
+    public Query where(String columnName, String operator, Object value) {
+        return this.query().where(columnName, operator, value);
+    }
+
+    @Override
+    public Query orWhere(String columnName, String operator, Object value) {
+        return this.query().orWhere(columnName, operator, value);
+    }
+
+    @Override
+    public Query group(String columnName) {
+        return this.query().group(columnName);
+    }
+
+    @Override
+    public Query having(String columnName, String operator, Object value) {
+        return this.query().having(columnName, operator, value);
+    }
+
+    @Override
+    public Query orHaving(String columnName, String operator, Object value) {
+        return this.query().orHaving(columnName, operator, value);
+    }
+
+    @Override
+    public Query order(String columnName, boolean ascendant) {
+        return this.query().order(columnName, ascendant);
+    }
+
+    @Override
+    public Query limit(int maxResults) {
+        return this.query().limit(maxResults);
+    }
+
+    @Override
+    public Query offset(int firstResultIndex) {
+        return this.query().offset(firstResultIndex);
     }
 
     public static Database use(String name) {
