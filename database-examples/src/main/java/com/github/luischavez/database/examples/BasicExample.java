@@ -75,13 +75,13 @@ public class BasicExample implements Example {
         this.alterTables(database);
 
         Affecting insert = database.insert(USER_TABLE_NAME, "username, password, register_date",
-                "luischavez", "test", LocalDateTime.now().toString());
+                "luischavez", "test", LocalDateTime.now());
 
         Object[] keys = insert.getGeneratedKeys();
 
         for (Object key : keys) {
             database.where("user_id", "=", key)
-                    .update("users", "password", new Object[]{"encrypted"});
+                    .update("users", "password", "encrypted");
 
             database.insert(PROFILE_TABLE_NAME, "user_id, description", key, "lorem ipsum etc etc");
         }
