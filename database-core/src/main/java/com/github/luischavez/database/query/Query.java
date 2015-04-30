@@ -131,7 +131,11 @@ public class Query implements Queryable<Query>, Compilable {
         return this.handler.affect(this);
     }
 
-    public Affecting update(String tableName, String columns, Object[] values) {
+    public Affecting insert(String tableName, String columns, Object... values) {
+        return this.insert(tableName, columns, new Object[][]{values});
+    }
+
+    public Affecting update(String tableName, String columns, Object... values) {
         this.updateRows(tableName, columns, values);
         return this.handler.affect(this);
     }
