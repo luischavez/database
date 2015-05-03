@@ -37,22 +37,17 @@ public class ProjectSource implements ConfigurationSource {
     @Override
     public byte[] read() {
         URL url = getClass().getResource(this.resourceName);
-
         byte[] bytes;
         try (InputStream inputStream = url.openStream(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[0xFFFF];
-
             for (int len; (len = inputStream.read(buffer)) != -1;) {
                 outputStream.write(buffer, 0, len);
             }
-
             outputStream.flush();
-
             bytes = outputStream.toByteArray();
         } catch (IOException ex) {
             throw new ConfigurationSourceException("Can't read resource " + url.getPath(), ex);
         }
-
         return bytes;
     }
 }

@@ -28,13 +28,11 @@ public abstract class Grammar implements Compiler {
 
     protected String glue(String union, String[] strings) {
         StringBuilder builder = new StringBuilder();
-
         for (String string : strings) {
             if (null != string && !string.isEmpty()) {
                 builder.append(union).append(string);
             }
         }
-
         return builder.toString().replaceFirst(union, "").trim();
     }
 
@@ -49,13 +47,10 @@ public abstract class Grammar implements Compiler {
         SQLType type = compilable.type();
         ComponentBag componentBag = compilable.components();
         Bindings bindings = compilable.bindings();
-
         String compiled = this.compile(type, componentBag, bindings);
-
         if (null == compiled) {
             throw new CompilerException("Unsupported SQL " + type.name());
         }
-
         return compiled;
     }
 }

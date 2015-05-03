@@ -68,12 +68,9 @@ public class Query implements Queryable<Query>, Compilable {
 
     protected void insertRows(String tableName, String columns, Object[][] values) {
         this.type = SQLType.INSERT;
-
         this.componentBag.removeAll(ColumnComponent.class);
-
         this.from(tableName);
         this.column(columns);
-
         for (Object[] row : values) {
             this.bindings.set("values", row);
         }
@@ -81,12 +78,9 @@ public class Query implements Queryable<Query>, Compilable {
 
     protected void updateRows(String tableName, String columns, Object[] values) {
         this.type = SQLType.UPDATE;
-
         this.componentBag.removeAll(ColumnComponent.class);
-
         this.from(tableName);
         this.column(columns);
-
         this.bindings.set("values", values);
     }
 
@@ -105,16 +99,13 @@ public class Query implements Queryable<Query>, Compilable {
     }
 
     public RowList get() {
-        return this.get(null);
+        return this.get("*");
     }
 
     public Row first(boolean onlyDistinctResults, String columns) {
         this.limit(1);
-
         RowList result = this.get(onlyDistinctResults, columns);
-
         this.componentBag.removeAll(LimitComponent.class);
-
         return result.empty() ? null : result.getRow(0);
     }
 

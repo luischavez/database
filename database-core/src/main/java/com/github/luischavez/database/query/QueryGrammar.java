@@ -49,18 +49,14 @@ public class QueryGrammar extends Grammar {
     protected String getValueString(Object value) {
         if (value instanceof Object[]) {
             Object[] values = Object[].class.cast(value);
-
             StringBuilder builder = new StringBuilder();
-
             builder.append("(");
             for (int i = 0; i < values.length; i++) {
                 builder.append(",?");
             }
             builder.append(")");
-
             return builder.toString().replaceFirst("\\(,", "\\(");
         }
-
         return "?";
     }
 
@@ -71,50 +67,40 @@ public class QueryGrammar extends Grammar {
     protected String dot(String string) {
         if (string.contains(".")) {
             String[] dot = string.split("\\.", 2);
-
             return this.wrap(dot[0]) + "." + this.wrap(dot[1]);
         }
-
         return this.wrap(string);
     }
 
     protected String alias(String string) {
         if (string.contains(" ")) {
             String[] alias = string.split(" ", 2);
-
             return this.dot(alias[0]) + " " + this.dot(alias[1]);
         }
-
         return this.dot(string);
     }
 
     protected String as(String string) {
         if (string.contains(" AS ")) {
             String[] as = string.split(" AS ", 2);
-
             return this.alias(as[0]) + " AS " + this.alias(as[1]);
         }
-
         return this.alias(string);
     }
 
     protected String[] split(String columns) {
         String[] split = columns.split(",");
-
         for (int i = 0; i < split.length; i++) {
             split[i] = split[i].trim();
         }
-
         return split;
     }
 
     protected String join(String[] columns) {
         StringBuilder builder = new StringBuilder();
-
         for (String column : columns) {
             builder.append(",").append(column);
         }
-
         return builder.toString().replaceFirst(",", "");
     }
 
@@ -122,13 +108,10 @@ public class QueryGrammar extends Grammar {
         if ("*".equals(string)) {
             return string;
         }
-
         String[] segments = this.split(string);
-
         for (int i = 0; i < segments.length; i++) {
             segments[i] = this.as(segments[i]);
         }
-
         return this.join(segments);
     }
 
@@ -140,14 +123,11 @@ public class QueryGrammar extends Grammar {
         if (columnComponents.isEmpty()) {
             return "";
         }
-
         StringBuilder builder = new StringBuilder();
-
         for (ColumnComponent columnComponent : columnComponents) {
             String columnName = columnComponent.getColumnName();
             builder.append(",").append(this.escape(columnName));
         }
-
         return builder.toString().replaceFirst(",", "");
     }
 
@@ -155,9 +135,7 @@ public class QueryGrammar extends Grammar {
         if (columnComponents.isEmpty()) {
             return "";
         }
-
         StringBuilder builder = new StringBuilder();
-
         for (ColumnComponent columnComponent : columnComponents) {
             String columnName = columnComponent.getColumnName();
 
@@ -165,7 +143,6 @@ public class QueryGrammar extends Grammar {
                 builder.append(",").append(this.wrap(column));
             }
         }
-
         return builder.toString().replaceFirst(",", "");
     }
 
@@ -173,9 +150,7 @@ public class QueryGrammar extends Grammar {
         if (columnComponents.isEmpty()) {
             return "";
         }
-
         StringBuilder builder = new StringBuilder();
-
         builder.append("SET ");
         for (ColumnComponent columnComponent : columnComponents) {
             String columnName = columnComponent.getColumnName();
@@ -183,7 +158,6 @@ public class QueryGrammar extends Grammar {
                     .append(this.wrap(columnName))
                     .append(" = ?");
         }
-
         return builder.toString().replaceFirst(",", "");
     }
 
@@ -191,9 +165,7 @@ public class QueryGrammar extends Grammar {
         if (null == tableComponent) {
             throw new CompilerException("Undefined table");
         }
-
         String tableName = tableComponent.getTableName();
-
         return this.escape(tableName);
     }
 
@@ -201,37 +173,29 @@ public class QueryGrammar extends Grammar {
         if (joinComponents.isEmpty()) {
             return "";
         }
-
         StringBuilder builder = new StringBuilder();
-
         for (JoinComponent joinComponent : joinComponents) {
             List<JoinClause> clauses = joinComponent.getClauses();
             if (clauses.isEmpty()) {
                 continue;
             }
-
             JoinType type = joinComponent.getType();
             String tableName = joinComponent.getTableName();
-
             builder.append(this.getJoinTypeString(type))
                     .append(" JOIN ")
                     .append(this.escape(tableName));
-
             for (JoinClause clause : clauses) {
                 boolean and = clause.isAnd();
                 String firstColumn = clause.getFirstColumn();
                 String operator = clause.getOperator();
                 String secondColumn = clause.getSecondColumn();
-
                 builder.append(and ? " ON " : " OR ")
                         .append(this.escape(firstColumn))
                         .append(" ").append(this.getOperatorString(operator))
                         .append(" ").append(this.escape(secondColumn));
             }
-
             builder.append(" ");
         }
-
         return builder.toString().trim();
     }
 
@@ -239,23 +203,18 @@ public class QueryGrammar extends Grammar {
         if (whereComponents.isEmpty()) {
             return "";
         }
-
         StringBuilder builder = new StringBuilder();
-
         for (WhereComponent whereComponent : whereComponents) {
             boolean and = whereComponent.isAnd();
             String columnName = whereComponent.getColumnName();
             String operator = whereComponent.getOperator();
             Object value = whereComponent.getValue();
-
             builder.append(and ? " AND " : " OR ")
                     .append(this.escape(columnName))
                     .append(" ").append(this.getOperatorString(operator))
                     .append(" ").append(this.getValueString(value));
         }
-
         String wheres = builder.toString().replaceFirst("AND |OR ", "").trim();
-
         return "WHERE " + wheres;
     }
 
@@ -263,23 +222,18 @@ public class QueryGrammar extends Grammar {
         if (havingComponents.isEmpty()) {
             return "";
         }
-
         StringBuilder builder = new StringBuilder();
-
         for (HavingComponent havingComponent : havingComponents) {
             boolean and = havingComponent.isAnd();
             String columnName = havingComponent.getColumnName();
             String operator = havingComponent.getOperator();
             Object value = havingComponent.getValue();
-
             builder.append(and ? " AND " : " OR ")
                     .append(this.escape(columnName))
                     .append(" ").append(this.getOperatorString(operator))
                     .append(" ").append(this.getValueString(value));
         }
-
         String wheres = builder.toString().replaceFirst("AND |OR ", "").trim();
-
         return "HAVING " + wheres;
     }
 
@@ -287,16 +241,12 @@ public class QueryGrammar extends Grammar {
         if (groupComponents.isEmpty()) {
             return "";
         }
-
         StringBuilder builder = new StringBuilder();
-
         for (GroupComponent groupComponent : groupComponents) {
             String columnName = groupComponent.getColumnName();
             builder.append(",").append(columnName);
         }
-
         String groups = builder.toString().replaceFirst(",", "");
-
         return "GROUP BY " + this.escape(groups);
     }
 
@@ -304,19 +254,14 @@ public class QueryGrammar extends Grammar {
         if (orderComponents.isEmpty()) {
             return "";
         }
-
         StringBuilder builder = new StringBuilder();
-
         for (OrderComponent orderComponent : orderComponents) {
             String columnName = orderComponent.getColumnName();
             boolean ascendant = orderComponent.isAscendant();
-
             builder.append(",").append(this.escape(columnName))
                     .append(" ").append(ascendant ? "ASC" : "DESC");
         }
-
         String orders = builder.toString().replaceFirst(",", "");
-
         return "ORDER BY " + orders;
     }
 
@@ -324,7 +269,6 @@ public class QueryGrammar extends Grammar {
         if (null == limitComponent) {
             return "";
         }
-
         return "LIMIT " + limitComponent.getMaxResults();
     }
 
@@ -332,7 +276,6 @@ public class QueryGrammar extends Grammar {
         if (null == offsetComponent) {
             return "";
         }
-
         return "OFFSET " + offsetComponent.getFirstResultIndex();
     }
 
@@ -340,11 +283,9 @@ public class QueryGrammar extends Grammar {
         TableComponent tableComponent = componentBag.getFirst(TableComponent.class);
         LimitComponent limitComponent = componentBag.getFirst(LimitComponent.class);
         OffsetComponent offsetComponent = componentBag.getFirst(OffsetComponent.class);
-
         if (null != offsetComponent && null == limitComponent) {
             throw new CompilerException("Can't create offset without limit");
         }
-
         DistinctComponent distinctComponent = componentBag.getFirst(DistinctComponent.class);
         List<ColumnComponent> columnComponents = componentBag.getAll(ColumnComponent.class);
         List<JoinComponent> joinComponents = componentBag.getAll(JoinComponent.class);
@@ -352,14 +293,11 @@ public class QueryGrammar extends Grammar {
         List<GroupComponent> groupComponents = componentBag.getAll(GroupComponent.class);
         List<HavingComponent> havingComponents = componentBag.getAll(HavingComponent.class);
         List<OrderComponent> orderComponents = componentBag.getAll(OrderComponent.class);
-
         String distinct = this.compileDistinct(distinctComponent);
         String columns = this.compileColumns(columnComponents);
-
         if (columns.isEmpty()) {
             columns = "*";
         }
-
         String table = this.compileTable(tableComponent);
         String joins = this.compileJoins(joinComponents);
         String wheres = this.compileWheres(whereComponents);
@@ -368,7 +306,6 @@ public class QueryGrammar extends Grammar {
         String orders = this.compileOrders(orderComponents);
         String limit = this.compileLimit(limitComponent);
         String offset = this.compileOffset(offsetComponent);
-
         return this.glue(new String[]{
             "SELECT", distinct, columns,
             "FROM", table,
@@ -386,35 +323,27 @@ public class QueryGrammar extends Grammar {
     protected String compileInsert(ComponentBag componentBag, Bindings bindings) {
         TableComponent tableComponent = componentBag.getFirst(TableComponent.class);
         List<ColumnComponent> columnComponents = componentBag.getAll(ColumnComponent.class);
-
         Object[] objects = bindings.get("values");
-
         String table = this.compileTable(tableComponent);
         String columns = this.compileInsertColumns(columnComponents);
         String values = "()";
-
         int columnLength = columns.isEmpty() ? 0 : this.split(columns).length;
         int rows = objects.length;
-
         if (0 == rows) {
             return this.compileEmptyInsert(table);
         }
-
         StringBuilder builder = new StringBuilder();
-
         if (0 < rows) {
             for (int i = 0; i < rows; i++) {
                 Object[] row = Object[].class.cast(objects[i]);
                 if (columnLength != row.length) {
                     throw new CompilerException("Value count not match column count at row " + (i + 1));
                 }
-
                 builder.append(",")
                         .append(this.getValueString(new Object[columnLength]));
             }
             values = builder.toString().replaceFirst(",", "");
         }
-
         return this.glue(new String[]{
             "INSERT INTO", table, "(" + columns + ")", "VALUES", values});
     }
@@ -423,38 +352,29 @@ public class QueryGrammar extends Grammar {
         TableComponent tableComponent = componentBag.getFirst(TableComponent.class);
         List<ColumnComponent> columnComponents = componentBag.getAll(ColumnComponent.class);
         List<WhereComponent> whereComponents = componentBag.getAll(WhereComponent.class);
-
         if (columnComponents.isEmpty()) {
             throw new CompilerException("Undefined columns in update");
         }
-
         Object[] objects = bindings.get("values");
-
         if (0 == objects.length) {
             throw new CompilerException("Undefined values in update");
         }
-
         String table = this.compileTable(tableComponent);
         String columns = this.compileUpdateColumns(columnComponents);
         String wheres = this.compileWheres(whereComponents);
-
         int columnLength = this.split(columns).length;
         int valueLength = objects.length;
-
         if (columnLength != valueLength) {
             throw new CompilerException("Value count not match column count");
         }
-
         return this.glue(new String[]{"UPDATE", table, columns, wheres});
     }
 
     protected String compileDelete(ComponentBag componentBag) {
         TableComponent tableComponent = componentBag.getFirst(TableComponent.class);
         List<WhereComponent> whereComponents = componentBag.getAll(WhereComponent.class);
-
         String table = this.compileTable(tableComponent);
         String wheres = this.compileWheres(whereComponents);
-
         return this.glue(new String[]{"DELETE FROM", table, wheres});
     }
 

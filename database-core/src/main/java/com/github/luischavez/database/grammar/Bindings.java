@@ -43,9 +43,7 @@ public class Bindings {
         if (!this.bindingMap.containsKey(type)) {
             return new Object[0];
         }
-
         List<Object> objects = this.bindingMap.get(type);
-
         return objects.toArray();
     }
 
@@ -57,9 +55,7 @@ public class Bindings {
         if (!this.bindingMap.containsKey(type)) {
             this.bindingMap.put(type, new ArrayList<>());
         }
-
         List<Object> objects = this.bindingMap.get(type);
-
         if ("values".equals(type) && !(object instanceof Object[])) {
             objects.add(new Object[]{object});
         } else {
@@ -69,10 +65,8 @@ public class Bindings {
 
     public Object[] getArray(String[] types) {
         List<Object> allObjects = new ArrayList<>();
-
         for (String type : types) {
             Object[] objects = this.get(type);
-
             for (Object object : objects) {
                 if (object instanceof Object[]) {
                     Object[] subObjects = Object[].class.cast(object);
@@ -82,13 +76,11 @@ public class Bindings {
                 }
             }
         }
-
         return allObjects.toArray();
     }
 
     public Object[] getArray() {
         Set<String> keys = this.bindingMap.keySet();
-
         String[] types = keys.toArray(new String[0]);
         return this.getArray(types);
     }

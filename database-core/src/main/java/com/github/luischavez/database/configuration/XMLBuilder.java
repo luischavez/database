@@ -44,102 +44,76 @@ public class XMLBuilder implements ConfigurationBuilder {
     @Override
     public List<Configuration> build(ConfigurationSource source) {
         byte[] bytes = source.read();
-
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setIgnoringElementContentWhitespace(true);
-
         DocumentBuilder documentBuilder;
         try {
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException ex) {
             throw new ConfigurationBuilderException("Can't create xml document builder", ex);
         }
-
         Document document;
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
             document = documentBuilder.parse(inputStream);
         } catch (IOException | SAXException ex) {
             throw new ConfigurationBuilderException("Can't parse document", ex);
         }
-
         document.getDocumentElement().normalize();
-
         NodeList configurationNodes = document.getElementsByTagName("configuration");
-
         int configurationLength = configurationNodes.getLength();
-
         List<Configuration> configurations = new ArrayList<>();
-
         for (int i = 0; i < configurationLength; i++) {
             Node configurationNode = configurationNodes.item(i);
             if (Node.ELEMENT_NODE != configurationNode.getNodeType()) {
                 throw new ConfigurationBuilderException("Invalid node type for configuration index " + i);
             }
-
             Element configurationElement = Element.class.cast(configurationNode);
-
             NodeList nameNodes = configurationElement.getElementsByTagName("name");
             if (0 == nameNodes.getLength()) {
                 throw new ConfigurationBuilderException("Can't find name in configuration index " + i);
             }
-
             Node firstNameNode = nameNodes.item(0);
             if (Node.ELEMENT_NODE != firstNameNode.getNodeType()) {
                 throw new ConfigurationBuilderException("Invalid node type for name in configuration index " + i);
             }
-
             Element nameElement = Element.class.cast(firstNameNode);
             String name = nameElement.getChildNodes().item(0).getNodeValue();
-
             NodeList supportNodes = configurationElement.getElementsByTagName("support");
             if (0 == supportNodes.getLength()) {
                 throw new ConfigurationBuilderException("Can't find support in configuration index " + i);
             }
-
             Node firstSupportNode = supportNodes.item(0);
             if (Node.ELEMENT_NODE != firstSupportNode.getNodeType()) {
                 throw new ConfigurationBuilderException("Invalid node type for support in configuration index " + i);
             }
-
             Element supportElement = Element.class.cast(firstSupportNode);
             String supportClassName = supportElement.getChildNodes().item(0).getNodeValue();
-
             NodeList propertiesNodes = configurationElement.getElementsByTagName("properties");
             if (0 == propertiesNodes.getLength()) {
                 throw new ConfigurationBuilderException("Can't find properties in configuration index " + i);
             }
-
             Node firstPropertiesNode = propertiesNodes.item(0);
             if (Node.ELEMENT_NODE != firstPropertiesNode.getNodeType()) {
                 throw new ConfigurationBuilderException("Invalid node type for properties in configuration index " + i);
             }
-
             Element propertiesElement = Element.class.cast(firstPropertiesNode);
-
             NodeList definedPropertiesNodes = propertiesElement.getChildNodes();
             int propertiesLength = definedPropertiesNodes.getLength();
-
             Map<String, String> properties = new HashMap<>();
-
             for (int j = 0; j < propertiesLength; j++) {
                 Node propertyNode = definedPropertiesNodes.item(j);
-
                 if (Node.ELEMENT_NODE == propertyNode.getNodeType()) {
                     String propertyName = propertyNode.getNodeName();
                     String propertyValue = null;
-
                     if (0 < propertyNode.getChildNodes().getLength()) {
                         propertyValue = propertyNode.getChildNodes().item(0).getTextContent();
                     }
-
                     properties.put(propertyName, propertyValue);
                 }
             }
-
             Configuration configuration = new Configuration(name, supportClassName, properties);
             configurations.add(configuration);
         }
-
         return configurations;
     }
 }

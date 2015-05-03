@@ -242,29 +242,23 @@ public class Database implements Queryable<Query> {
                 return database;
             }
         }
-
         throw new DatabaseException("Database not found " + name);
     }
 
     public static void load(ConfigurationBuilder builder, ConfigurationSource source) {
         Database.DATABASES.clear();
-
         List<Configuration> configurations = builder.build(source);
-
         for (Configuration configuration : configurations) {
             String supportClassName = configuration.getSupportClassName();
-
             Class<?> supportClass;
             try {
                 supportClass = Class.forName(supportClassName);
             } catch (ClassNotFoundException ex) {
                 throw new InvalidSupportClassException("Can't find support class " + supportClassName, ex);
             }
-
             if (!Support.class.isAssignableFrom(supportClass)) {
                 throw new InvalidSupportClassException("Class " + supportClassName + " not implements Support");
             }
-
             Support support;
             try {
                 Object newInstance = supportClass.newInstance();
@@ -272,7 +266,6 @@ public class Database implements Queryable<Query> {
             } catch (IllegalAccessException | InstantiationException ex) {
                 throw new InvalidSupportClassException("Can't load support class " + supportClassName, ex);
             }
-
             Database database = new Database(configuration, support);
             database.configure();
             Database.DATABASES.add(database);
