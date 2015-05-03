@@ -46,12 +46,14 @@ public class Database implements Queryable<Query> {
 
     private final Configuration configuration;
     private final Support support;
+    private final Migrator migrator;
 
     private Link link;
 
     public Database(Configuration configuration, Support support) {
         this.configuration = configuration;
         this.support = support;
+        this.migrator = new Migrator();
         this.link = null;
     }
 
@@ -85,6 +87,14 @@ public class Database implements Queryable<Query> {
         Grammar grammar = this.support.schemaGrammar();
         Handler handler = this.handle(grammar);
         handler.execute(blueprint);
+    }
+
+    public void migrate() {
+        this.migrator.migrate(this);
+    }
+
+    public void rollback() {
+        this.migrator.rollback(this);
     }
 
     public Query query() {
