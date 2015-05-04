@@ -19,6 +19,7 @@ package com.github.luischavez.database.link;
 import java.math.BigDecimal;
 
 import java.nio.ByteBuffer;
+
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;

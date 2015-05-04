@@ -167,5 +167,64 @@ Using filters
 mysql.where("name", "=", "Luis").delete("users");
 ```
 ## Schema builder
+### Column types
+Type        | Schema function
+:---------- | :--------------
+Boolean     | table.bool(columnName);
+Time        | table.time(columnName);
+Date        | table.date(columnName);
+Datetime    | table.timestamp(columnName);
+String      | table.string(columnName, length);
+Text        | table.text(columnName);
+Integer     | table.integer(columnName, length);
+Decimal     | table.decimal(columnName, length, zeros);
+### Definition
+Type            | Schema function
+:-------------- | :--------------
+Null            | table.text(columnName).nullable();
+Unsigned        | table.integer(columnName).unsigned();
+Autoincrement   | table.integer(columnName).incremented();
+Default         | table.timestamp(columnName).defaults(value);
+### Constraint types
+Type        | Schema function
+:---------- | :--------------
+Primary     | table.primary(columnName);
+Unique      | table.unique(columnName);
+Index       | table.index(columnName);
+Foreign     | table.foreign(columnName, relatedTableName, relatedColumnName, onDelete, onUpdate);
+### Create
+```java
+mysql.create("users", table -> {
+    table.integer("user_id").incremented();
+    table.string("name", 64);
+    table.string("lastname", 64);
+    table.string("user_type", 20).defaults("USER");
+    table.primary("user_id");
+});
+```
+### Alter
+```java
+mysql.table("users", table -> {
+    // add columns.
+    table.timestamp("register_datetime");
+    // modify columns.
+    table.modify(columns -> {
+        columns.string("user_type", 10).defaults("ADMIN");
+    });
+    // drop columns.
+    table.drop("user_type");
+    // drop primary key.
+    table.dropPrimary();
+});
+```
+### Drop
+```java
+mysql.drop("users");
+```
+### Exists
+```java
+if (mysql.exists("users")) {
+}
+```
 # Authors
 - Luis Chávez <https://github.com/luischavez>
