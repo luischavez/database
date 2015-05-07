@@ -109,6 +109,14 @@ public class SchemaGrammar extends Grammar {
         return "DROP COLUMN ".concat(this.wrap(columnName));
     }
 
+    protected String getOnDeleteString(String onDelete) {
+        return "ON DELETE ".concat(onDelete);
+    }
+
+    protected String getOnUpdateString(String onUpdate) {
+        return "ON UPDATE ".concat(onUpdate);
+    }
+
     protected String getConstraintString(String columnName, ConstraintDefinition definition) {
         if (definition instanceof ForeignDefinition) {
             ForeignDefinition foreign = ForeignDefinition.class.cast(definition);
@@ -117,10 +125,10 @@ public class SchemaGrammar extends Grammar {
                 this.wrap(definition.getConstraintName()),
                 this.getConstraintTypeString(definition.getConstraintType()),
                 "(", this.wrap(columnName), ")",
-                "REFERENCES ", this.wrap(foreign.getRelatedTableName()),
+                "REFERENCES", this.wrap(foreign.getRelatedTableName()),
                 "(" + this.wrap(foreign.getRelatedColumnName()) + ")",
-                "ON DELETE", foreign.getOnDelete(),
-                "ON UPDATE", foreign.getOnUpdate()
+                this.getOnDeleteString(foreign.getOnDelete()),
+                this.getOnUpdateString(foreign.getOnUpdate())
             });
         }
         return this.glue(new String[]{
