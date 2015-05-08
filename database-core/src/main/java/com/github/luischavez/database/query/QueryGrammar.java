@@ -362,11 +362,6 @@ public class QueryGrammar extends Grammar {
         String table = this.compileTable(tableComponent);
         String columns = this.compileUpdateColumns(columnComponents);
         String wheres = this.compileWheres(whereComponents);
-        int columnLength = this.split(columns).length;
-        int valueLength = objects.length;
-        if (columnLength != valueLength) {
-            throw new CompilerException("Value count not match column count");
-        }
         return this.glue(new String[]{"UPDATE", table, columns, wheres});
     }
 
