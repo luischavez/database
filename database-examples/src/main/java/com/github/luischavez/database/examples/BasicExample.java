@@ -86,7 +86,7 @@ public class BasicExample implements Example {
             database.insert(PROFILE_TABLE_NAME, "user_id, description", key, "lorem ipsum etc etc");
         }
 
-        RowList users = database.query("users u")
+        RowList users = database.table("users u")
                 .join("profiles p", "u.user_id", "=", "p.user_id")
                 .get();
         this.log("User count: {}", users.size());
@@ -95,7 +95,7 @@ public class BasicExample implements Example {
                     user.value("username"), user.value("password"), user.value("register_date"), user.value("description"));
         }
 
-        Row user = database.query(USER_TABLE_NAME).first();
+        Row user = database.table(USER_TABLE_NAME).first();
         this.log("First user: {}", user.value("username"));
 
         database.where("user_id", "IN", keys).delete(USER_TABLE_NAME);

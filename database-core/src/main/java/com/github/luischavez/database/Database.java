@@ -27,6 +27,8 @@ import com.github.luischavez.database.handler.DefaultHandler;
 import com.github.luischavez.database.handler.Handler;
 import com.github.luischavez.database.link.Affecting;
 import com.github.luischavez.database.link.Link;
+import com.github.luischavez.database.link.Row;
+import com.github.luischavez.database.link.RowList;
 import com.github.luischavez.database.link.Transform;
 import com.github.luischavez.database.query.Query;
 import com.github.luischavez.database.query.Queryable;
@@ -103,26 +105,6 @@ public class Database implements Queryable<Query> {
         return new Query(handler);
     }
 
-    public Query query(String tableName) {
-        return this.query().from(tableName);
-    }
-
-    public Affecting insert(String tableName, String columns, Object... values) {
-        return this.query().insert(tableName, columns, new Object[][]{values});
-    }
-
-    public Affecting insert(String tableName, String columns, Object[][] values) {
-        return this.query().insert(tableName, columns, values);
-    }
-
-    public Affecting update(String tableName, String columns, Object... values) {
-        return this.query().update(tableName, columns, values);
-    }
-
-    public Affecting delete(String tableName) {
-        return this.query().delete(tableName);
-    }
-
     public void create(String tableName, Fluentable<Blueprint> fluentable) {
         Blueprint blueprint = new Blueprint(SQLType.CREATE, tableName);
         fluentable.fluent(blueprint);
@@ -145,13 +127,13 @@ public class Database implements Queryable<Query> {
     }
 
     @Override
-    public Query distinct(boolean onlyDistinctResults) {
-        return this.query().distinct(onlyDistinctResults);
+    public Query table(String tableName) {
+        return this.query().table(tableName);
     }
 
     @Override
-    public Query column(String columnName) {
-        return this.query().column(columnName);
+    public Query distinct(boolean onlyDistinctResults) {
+        return this.query().distinct(onlyDistinctResults);
     }
 
     @Override
@@ -242,6 +224,36 @@ public class Database implements Queryable<Query> {
     @Override
     public Query offset(int firstResultIndex) {
         return this.query().offset(firstResultIndex);
+    }
+
+    @Override
+    public Affecting insert(String tableName, String columns, Object... values) {
+        return this.query().insert(tableName, columns, new Object[][]{values});
+    }
+
+    @Override
+    public Affecting insert(String tableName, String columns, Object[][] values) {
+        return this.query().insert(tableName, columns, values);
+    }
+
+    @Override
+    public Affecting update(String tableName, String columns, Object... values) {
+        return this.query().update(tableName, columns, values);
+    }
+
+    @Override
+    public Affecting delete(String tableName) {
+        return this.query().delete(tableName);
+    }
+
+    @Override
+    public RowList get(String... columns) {
+        throw new UnsupportedOperationException("Use table method before fetch results");
+    }
+
+    @Override
+    public Row first(String... columns) {
+        throw new UnsupportedOperationException("Use table method before fetch results");
     }
 
     public static Database use(String name) {

@@ -17,6 +17,9 @@
 package com.github.luischavez.database.query;
 
 import com.github.luischavez.database.function.Fluentable;
+import com.github.luischavez.database.link.Affecting;
+import com.github.luischavez.database.link.Row;
+import com.github.luischavez.database.link.RowList;
 import com.github.luischavez.database.query.component.JoinComponent;
 
 /**
@@ -26,9 +29,9 @@ import com.github.luischavez.database.query.component.JoinComponent;
  */
 public interface Queryable<Q extends Queryable<Q>> {
 
-    public Q distinct(boolean onlyDistinctResults);
+    public Q table(String tableName);
 
-    public Q column(String columnName);
+    public Q distinct(boolean onlyDistinctResults);
 
     public Q join(String tableName, String firstColumn, String operator, String secondColumn);
 
@@ -65,4 +68,16 @@ public interface Queryable<Q extends Queryable<Q>> {
     public Q limit(int maxResults);
 
     public Q offset(int firstResultIndex);
+
+    public RowList get(String... columns);
+
+    public Row first(String... columns);
+
+    public Affecting insert(String tableName, String columns, Object[][] values);
+
+    public Affecting insert(String tableName, String columns, Object... values);
+
+    public Affecting update(String tableName, String columns, Object... values);
+
+    public Affecting delete(String tableName);
 }

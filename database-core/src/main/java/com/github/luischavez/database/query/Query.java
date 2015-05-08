@@ -57,20 +57,23 @@ public class Query implements Queryable<Query>, Compilable {
         this.type = SQLType.NONE;
     }
 
-    protected void selectRows(boolean onlyDistinctResults, String columns) {
-        this.type = SQLType.SELECT;
-        this.distinct(onlyDistinctResults);
-        if (null != columns) {
-            this.componentBag.removeAll(ColumnComponent.class);
-            this.column(columns);
+    protected void setColumns(String... columns) {
+        this.componentBag.removeAll(ColumnComponent.class);
+        for (String column : columns) {
+            if (null != column && !column.isEmpty()) {
+                this.componentBag.add(new ColumnComponent(column));
+            }
         }
+    }
+
+    protected void selectRows(String... columns) {
+        this.type = SQLType.SELECT;
+        this.setColumns(columns);
     }
 
     protected void insertRows(String tableName, String columns, Object[][] values) {
         this.type = SQLType.INSERT;
-        this.componentBag.removeAll(ColumnComponent.class);
-        this.from(tableName);
-        this.column(columns);
+        this.table(tableName).setColumns(columns);
         for (Object[] row : values) {
             this.bindings.set("values", row);
         }
@@ -78,65 +81,17 @@ public class Query implements Queryable<Query>, Compilable {
 
     protected void updateRows(String tableName, String columns, Object[] values) {
         this.type = SQLType.UPDATE;
-        this.componentBag.removeAll(ColumnComponent.class);
-        this.from(tableName);
-        this.column(columns);
+        this.table(tableName).setColumns(columns);
         this.bindings.set("values", values);
     }
 
     protected void deleteRows(String tableName) {
         this.type = SQLType.DELETE;
-        this.from(tableName);
+        this.table(tableName);
     }
 
-    public RowList get(boolean onlyDistinctResults, String columns) {
-        this.selectRows(onlyDistinctResults, columns);
-        return this.handler.fetch(this);
-    }
-
-    public RowList get(String columns) {
-        return this.get(false, columns);
-    }
-
-    public RowList get() {
-        return this.get("*");
-    }
-
-    public Row first(boolean onlyDistinctResults, String columns) {
-        this.limit(1);
-        RowList result = this.get(onlyDistinctResults, columns);
-        this.componentBag.removeAll(LimitComponent.class);
-        return result.empty() ? null : result.getRow(0);
-    }
-
-    public Row first(String columns) {
-        return this.first(false, columns);
-    }
-
-    public Row first() {
-        return this.first("*");
-    }
-
-    public Affecting insert(String tableName, String columns, Object[][] values) {
-        this.insertRows(tableName, columns, values);
-        return this.handler.affect(this);
-    }
-
-    public Affecting insert(String tableName, String columns, Object... values) {
-        return this.insert(tableName, columns, new Object[][]{values});
-    }
-
-    public Affecting update(String tableName, String columns, Object... values) {
-        this.updateRows(tableName, columns, values);
-        return this.handler.affect(this);
-    }
-
-    public Affecting delete(String tableName) {
-        this.deleteRows(tableName);
-        return this.handler.affect(this);
-    }
-
-    public Query from(String tableName) {
+    @Override
+    public Query table(String tableName) {
         this.componentBag.removeAll(TableComponent.class);
         if (null != tableName && !tableName.isEmpty()) {
             this.componentBag.add(new TableComponent(tableName));
@@ -149,14 +104,6 @@ public class Query implements Queryable<Query>, Compilable {
         this.componentBag.removeAll(DistinctComponent.class);
         if (onlyDistinctResults) {
             this.componentBag.add(new DistinctComponent());
-        }
-        return this;
-    }
-
-    @Override
-    public Query column(String columnName) {
-        if (null != columnName && !columnName.isEmpty()) {
-            this.componentBag.add(new ColumnComponent(columnName));
         }
         return this;
     }
@@ -283,6 +230,42 @@ public class Query implements Queryable<Query>, Compilable {
         this.componentBag.removeAll(OffsetComponent.class);
         this.componentBag.add(new OffsetComponent(firstResultIndex));
         return this;
+    }
+
+    @Override
+    public RowList get(String... columns) {
+        this.selectRows(columns);
+        return this.handler.fetch(this);
+    }
+
+    @Override
+    public Row first(String... columns) {
+        RowList rows = this.limit(1).get(columns);
+        this.componentBag.removeAll(LimitComponent.class);
+        return rows.empty() ? null : rows.getRow(0);
+    }
+
+    @Override
+    public Affecting insert(String tableName, String columns, Object[][] values) {
+        this.insertRows(tableName, columns, values);
+        return this.handler.affect(this);
+    }
+
+    @Override
+    public Affecting insert(String tableName, String columns, Object... values) {
+        return this.insert(tableName, columns, new Object[][]{values});
+    }
+
+    @Override
+    public Affecting update(String tableName, String columns, Object... values) {
+        this.updateRows(tableName, columns, values);
+        return this.handler.affect(this);
+    }
+
+    @Override
+    public Affecting delete(String tableName) {
+        this.deleteRows(tableName);
+        return this.handler.affect(this);
     }
 
     @Override

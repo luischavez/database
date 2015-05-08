@@ -99,7 +99,7 @@ public class Migrator {
         }
         Migration[] migrations = this.load();
         for (Migration migration : migrations) {
-            Row row = database.query("migrations").where("migration", "=", migration.getClass().getName()).first();
+            Row row = database.table("migrations").where("migration", "=", migration.getClass().getName()).first();
             if (null == row) {
                 migration.up(database);
                 database.insert("migrations", "migration, created_at", migration.getClass().getName(), LocalDateTime.now());
@@ -111,7 +111,7 @@ public class Migrator {
         if (!database.exists("migrations")) {
             return;
         }
-        RowList rows = database.query("migrations").order("created_at", false).get();
+        RowList rows = database.table("migrations").order("created_at", false).get();
         for (Row row : rows) {
             Object migrationClassName = row.value("migration");
             Migration migration = this.createInstace(migrationClassName.toString());

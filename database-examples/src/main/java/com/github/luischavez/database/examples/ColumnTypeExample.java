@@ -56,7 +56,7 @@ public class ColumnTypeExample implements Example {
 
         database.insert(TABLE_NAME, "text_column", "lorem ipsum etc etc");
 
-        Row columns = database.query(TABLE_NAME).first();
+        Row columns = database.table(TABLE_NAME).first();
         String[] keys = columns.keys();
         for (String key : keys) {
             Object value = columns.value(key);
