@@ -161,8 +161,8 @@ public class JDBCLink implements Link {
         this.close(statement);
     }
 
-    protected Affecting execute(String sql, Bindings bindings, Transform transform) {
-        PreparedStatement statement = this.preparedStatement(sql, true);
+    protected Affecting execute(String sql, Bindings bindings, Transform transform, boolean generateKeys) {
+        PreparedStatement statement = this.preparedStatement(sql, generateKeys);
         if (null != bindings) {
             Object[] values = bindings.getArray(new String[]{"values"});
             if (null != transform) {
@@ -209,17 +209,17 @@ public class JDBCLink implements Link {
 
     @Override
     public Affecting insert(String sql, Bindings bindings, Transform transform) {
-        return this.execute(sql, bindings, transform);
+        return this.execute(sql, bindings, transform, true);
     }
 
     @Override
     public Affecting update(String sql, Bindings bindings, Transform transform) {
-        return this.execute(sql, bindings, transform);
+        return this.execute(sql, bindings, transform, false);
     }
 
     @Override
     public Affecting delete(String sql, Bindings bindings) {
-        return this.execute(sql, bindings, null);
+        return this.execute(sql, bindings, null, false);
     }
 
     @Override
