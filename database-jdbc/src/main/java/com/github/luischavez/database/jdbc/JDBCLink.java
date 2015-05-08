@@ -187,8 +187,8 @@ public class JDBCLink implements Link {
         Object[] keys = new Object[0];
         if (null != resultSet) {
             keys = this.getGeneratedKeys(resultSet);
+            this.close(resultSet);
         }
-        this.close(resultSet);
         this.close(statement);
         return new Affecting(affectingCount, keys);
     }
