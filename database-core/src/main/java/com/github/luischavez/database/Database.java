@@ -115,6 +115,14 @@ public class Database implements Queryable<Query> {
         return this.query().insert(tableName, columns, values);
     }
 
+    public Affecting update(String tableName, String columns, Object... values) {
+        return this.query().update(tableName, columns, values);
+    }
+
+    public Affecting delete(String tableName) {
+        return this.query().delete(tableName);
+    }
+
     public void create(String tableName, Fluentable<Blueprint> fluentable) {
         Blueprint blueprint = new Blueprint(SQLType.CREATE, tableName);
         fluentable.fluent(blueprint);
