@@ -154,9 +154,11 @@ public class QueryGrammar extends Grammar {
         builder.append("SET ");
         for (ColumnComponent columnComponent : columnComponents) {
             String columnName = columnComponent.getColumnName();
-            builder.append(",")
-                    .append(this.wrap(columnName))
-                    .append(" = ?");
+            for (String column : this.split(columnName)) {
+                builder.append(",")
+                        .append(this.wrap(column))
+                        .append(" = ?");
+            }
         }
         return builder.toString().replaceFirst(",", "");
     }
