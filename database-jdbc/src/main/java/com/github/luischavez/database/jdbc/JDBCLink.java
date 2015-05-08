@@ -175,14 +175,19 @@ public class JDBCLink implements Link {
             this.setBindings(statement, wheres, values.length + 1);
         }
         int affectingCount;
-        ResultSet resultSet;
+        ResultSet resultSet = null;
         try {
             affectingCount = statement.executeUpdate();
-            resultSet = statement.getGeneratedKeys();
+            if (generateKeys) {
+                resultSet = statement.getGeneratedKeys();
+            }
         } catch (SQLException ex) {
             throw new QueryException("Can't execute sql", ex);
         }
-        Object[] keys = this.getGeneratedKeys(resultSet);
+        Object[] keys = new Object[0];
+        if (null != resultSet) {
+            keys = this.getGeneratedKeys(resultSet);
+        }
         this.close(resultSet);
         this.close(statement);
         return new Affecting(affectingCount, keys);
