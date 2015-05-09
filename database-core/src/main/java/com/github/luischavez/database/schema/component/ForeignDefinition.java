@@ -18,7 +18,7 @@ package com.github.luischavez.database.schema.component;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class ForeignDefinition extends ConstraintDefinition {
 

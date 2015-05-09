@@ -28,7 +28,7 @@ import org.h2.jdbcx.JdbcDataSource;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class H2Linker extends JDBCLinker {
 

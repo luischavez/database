@@ -27,7 +27,7 @@ import java.time.LocalTime;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class ColumnTypeExample implements Example {
 

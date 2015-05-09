@@ -22,7 +22,7 @@ import com.github.luischavez.database.schema.component.ConstraintDefinition;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class H2SchemaGrammar extends SchemaGrammar {
 

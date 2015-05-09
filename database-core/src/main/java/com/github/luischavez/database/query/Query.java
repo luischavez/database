@@ -39,7 +39,7 @@ import com.github.luischavez.database.query.component.WhereComponent;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class Query implements Queryable<Query>, Compilable {
 

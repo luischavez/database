@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class Configuration implements Serializable {
 

@@ -20,7 +20,7 @@ import com.github.luischavez.database.grammar.Component;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class DropConstraintComponent implements Component {
 

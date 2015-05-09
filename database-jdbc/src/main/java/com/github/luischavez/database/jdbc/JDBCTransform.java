@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class JDBCTransform implements Transform {
 

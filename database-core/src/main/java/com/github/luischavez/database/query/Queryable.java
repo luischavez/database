@@ -24,7 +24,7 @@ import com.github.luischavez.database.query.component.JoinComponent;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  * @param <Q>
  */
 public interface Queryable<Q extends Queryable<Q>> {

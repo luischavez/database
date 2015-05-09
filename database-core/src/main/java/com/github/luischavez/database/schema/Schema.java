@@ -20,7 +20,7 @@ import com.github.luischavez.database.schema.component.ColumnDefinition;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  * @param <T>
  */
 public class Schema<T> {
