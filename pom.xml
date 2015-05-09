@@ -18,9 +18,9 @@
         <module>database-examples</module>
     </modules>
     <scm>
-        <connection>scm:git:https://github.com/luischavez/database.git</connection>
-        <developerConnection>scm:git:git@github.com:luischavez/database.git</developerConnection>
         <url>https://github.com/luischavez/database</url>
+        <connection>scm:git:git://github.com/luischavez/database.git</connection>
+        <developerConnection>scm:git:git@github.com:luischavez/database.git</developerConnection>
         <tag>database-0.2</tag>
     </scm>
     <distributionManagement>
