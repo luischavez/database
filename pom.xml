@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.luischavez</groupId>
     <artifactId>database</artifactId>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,9 +19,9 @@
     </modules>
     <scm>
         <url>https://github.com/luischavez/database</url>
-        <connection>scm:git:git://github.com/luischavez/database.git</connection>
+        <connection>scm:git:https://github.com/luischavez/database.git</connection>
         <developerConnection>scm:git:git@github.com:luischavez/database.git</developerConnection>
-        <tag>database-0.2</tag>
+        <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <repository>
