@@ -22,8 +22,7 @@ package com.github.luischavez.database.schema.component;
  */
 public class ColumnDefinition {
 
-    private final String columnType;
-
+    private String columnType;
     private boolean nullable;
     private boolean unsigned;
     private boolean incremented;
@@ -37,6 +36,10 @@ public class ColumnDefinition {
 
     public String getColumnType() {
         return columnType;
+    }
+
+    public void setColumnType(String columnType) {
+        this.columnType = columnType;
     }
 
     public boolean isNullable() {

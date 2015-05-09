@@ -30,6 +30,14 @@ public class Affecting {
         this.generatedKeys = generatedkeys;
     }
 
+    public boolean success() {
+        return 0 < this.affectingCount;
+    }
+
+    public boolean fails() {
+        return 0 == this.affectingCount;
+    }
+
     public Object[] getGeneratedKeys() {
         return this.generatedKeys;
     }

@@ -36,20 +36,16 @@ public class LocalSource implements ConfigurationSource {
     @Override
     public byte[] read() {
         String userDir = System.getProperty("user.dir");
-
         File file = new File(userDir + File.separator + this.filePath);
-
         if (!file.exists()) {
             throw new ConfigurationSourceException("File " + file.getPath() + " not exist");
         }
-
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(file.toPath());
         } catch (IOException ex) {
             throw new ConfigurationSourceException("Can't read file " + file.getPath(), ex);
         }
-
         return bytes;
     }
 }

@@ -39,19 +39,16 @@ public class ComponentBag {
                 break;
             }
         }
-
         return firstComponent;
     }
 
     public <T extends Component> List<T> getAll(Class<T> componentClass) {
         List<T> filteredComponents = new ArrayList<>();
-
         for (Component component : this.components) {
             if (componentClass.isAssignableFrom(component.getClass())) {
                 filteredComponents.add(componentClass.cast(component));
             }
         }
-
         return filteredComponents;
     }
 
@@ -61,21 +58,17 @@ public class ComponentBag {
 
     public <T extends Component> boolean removeFirst(Class<T> componentClass) {
         T firstComponent = this.getFirst(componentClass);
-
         if (null == firstComponent) {
             return false;
         }
-
         return this.components.remove(firstComponent);
     }
 
     public <T extends Component> boolean removeAll(Class<T> componentClass) {
         List<T> allComponents = this.getAll(componentClass);
-
         if (allComponents.isEmpty()) {
             return false;
         }
-
         return this.components.removeAll(allComponents);
     }
 
@@ -85,7 +78,6 @@ public class ComponentBag {
                 return true;
             }
         }
-
         return false;
     }
 }

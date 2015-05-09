@@ -43,6 +43,11 @@ public class Row {
         return this.valueMap.get(key);
     }
 
+    public <T extends Object> T value(String key, Class<T> type) {
+        Object value = this.value(key);
+        return null == value ? null : type.cast(value);
+    }
+
     public String[] keys() {
         return this.valueMap.keySet().toArray(new String[0]);
     }
