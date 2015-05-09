@@ -1,5 +1,5 @@
 # Database access wrapper
-
+[ ![Download](https://api.bintray.com/packages/luischavez/maven/database/images/download.svg) ](https://bintray.com/luischavez/maven/database/_latestVersion)
 # Installation
 
 # Requeriments
@@ -59,49 +59,49 @@ mysql.close();
 ```
 ### Query first result
 ```java
-Row row = mysql.query("users").first();
+Row row = mysql.table("users").first();
 ```
 ### Query multiple results
 ```java
-RowList rows = mysql.query("users").get();
+RowList rows = mysql.table("users").get();
 ```
 ### Select columns
 ```java
-Row row = mysql.query("users").first("name, lastname");
-RowList rows = mysql.query("users").get("name");
+Row row = mysql.table("users").first("name, lastname");
+RowList rows = mysql.table("users").get("name");
 ```
 ### Where clauses
 ```java
-Row row = mysql.query("users").where("name", "=", "Luis").first();
+Row row = mysql.table("users").where("name", "=", "Luis").first();
 ```
 Multiple where clauses
 ```java
-Row row = mysql.query("users")
+Row row = mysql.table("users")
                 .where("name", "=", "Luis")
                 .orWhere("name", "=", "Walter")
                 .first();
 ```
 ### Having clauses
 ```java
-Row row = mysql.query("users").having("name", "=", "Luis").first();
+Row row = mysql.table("users").having("name", "=", "Luis").first();
 ```
 Multiple having clauses
 ```java
-Row row = mysql.query("users")
+Row row = mysql.table("users")
                 .having("name", "=", "Luis")
                 .orHaving("name", "=", "Walter")
                 .first();
 ```
 ### Join clauses
 ```java
-Row row = mysql.query("users u")
+Row row = mysql.table("users u")
                 .where("u.name", "=", "Luis")
                 .join("profiles p", "p.user_id", "=", "u.user_id")
                 .first();
 ```
 Multiple join filters
 ```java
-Row row = mysql.query("users u")
+Row row = mysql.table("users u")
                 .where("u.name", "=", "Luis")
                 .join("profiles p", join -> {
                     join.on("p.user_id", "=", "u.user_id")
@@ -111,30 +111,30 @@ Row row = mysql.query("users u")
 ```
 ### Groups
 ```java
-RowList rows = mysql.query("users")
+RowList rows = mysql.table("users")
                     .group("user_type")
                     .get("user_type, name, lastname");
 ```
 ### Ordering results
 Asc order
 ```java
-RowList rows = mysql.query("users")
+RowList rows = mysql.table("users")
                     .order("name", true);
                     .get("name");
 ```
 Desc order
 ```java
-RowList rows = mysql.query("users")
+RowList rows = mysql.table("users")
                     .order("name", false);
                     .get("name");
 ```
 ### Limit results
 ```java
-RowList rows = mysql.query("users").limit(10).get();
+RowList rows = mysql.table("users").limit(10).get();
 ```
 Offset support
 ```java
-RowList rows = mysql.query("users").limit(10).offset(5).get();
+RowList rows = mysql.table("users").limit(10).offset(5).get();
 ```
 ## Insert
 Insert one row
