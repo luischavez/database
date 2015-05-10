@@ -64,9 +64,6 @@ public class Database implements Queryable<Query> {
     }
 
     public void open() {
-        if (null == this.link) {
-            this.configure();
-        }
         if (null != this.link) {
             this.support.linker().close(this.link);
         }
@@ -297,6 +294,7 @@ public class Database implements Queryable<Query> {
         for (DatabaseConfiguration databaseConfiguration : databaseConfigurations) {
             Support support = Database.createInstance(Support.class, databaseConfiguration.getSupportClassName());
             Database database = new Database(databaseConfiguration, support);
+            database.configure();
             Database.DATABASES.add(database);
         }
     }
