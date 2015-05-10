@@ -9,28 +9,34 @@
 ## Configuration
 Configuration file example:
 ```xml
-<configurations>
-    <configuration>
-        <name>h2</name>
-        <support>com.github.luischavez.database.h2.H2Support</support>
-        <properties>
-            <database>database.h2</database>
-            <user>root</user>
-            <password>test</password>
-        </properties>
-    </configuration>
-    <configuration>
-        <name>mysql</name>
-        <support>com.github.luischavez.database.mysql.MySQLSupport</support>
-        <properties>
-            <server>localhost</server>
-            <database>example</database>
-            <port>3306</port>
-            <user>root</user>
-            <password></password>
-        </properties>
-    </configuration>
-</configurations>
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <databases>
+        <database>
+            <name>h2</name>
+            <support>com.github.luischavez.database.h2.H2Support</support>
+            <properties>
+                <item key="database" value="test.h2"/>
+                <item key="user" value="root"/>
+                <item key="password" value="test"/>
+            </properties>
+        </database>
+        <database>
+            <name>mysql</name>
+            <support>com.github.luischavez.database.mysql.MySQLSupport</support>
+            <properties>
+                <item key="server" value="localhost"/>
+                <item key="database" value="test"/>
+                <item key="port" value="3306"/>
+                <item key="user" value="root"/>
+                <item key="password" value=""/>
+            </properties>
+        </database>
+    </databases>
+    <migrators>
+        <migrator>com.github.luischavez.database.examples.MyMigrator</migrator>
+    </migrators>
+</configuration>
 ```
 ### Local source
 Local source configuration should be placed on the project working directory.
@@ -225,6 +231,49 @@ mysql.drop("users");
 ```java
 if (mysql.exists("users")) {
 }
+```
+## Migrations
+Define migrations
+```java
+public class CreateUsersTable implements Migration {
+    @Override
+    public void up(Database database) {
+        database.create("users", table -> {
+            table.string("name", 32);
+            table.string("lastname", 32);
+        });
+    }
+    @Override
+    public void down(Database database) {
+        database.drop("users");
+    }
+}
+```
+Create custom migrator
+```java
+public class MyMigrator extends Migrator {
+    @Override
+    public void setup() {
+        this.register(new CreateUsersTable());
+    }
+}
+```
+Configuration
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <migrators>
+        <migrator>com.github.luischavez.database.examples.MyMigrator</migrator>
+    </migrators>
+</configuration>
+```
+### Migrate
+```java
+mysql.migrate();
+```
+### Rollback
+```java
+mysql.rollback();
 ```
 # Authors
 - Luis Chávez <https://github.com/luischavez>
