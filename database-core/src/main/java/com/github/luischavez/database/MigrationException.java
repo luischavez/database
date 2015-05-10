@@ -18,7 +18,7 @@ package com.github.luischavez.database;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class MigrationException extends RuntimeException {
 

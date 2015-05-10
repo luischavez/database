@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Luis Chávez <https://github.com/luischavez>
+ * Copyright (C) 2015 Luis Chávez {@literal <https://github.com/luischavez>}
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,33 @@
 package com.github.luischavez.database.examples;
 
 import com.github.luischavez.database.Database;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.luischavez.database.Migration;
+import com.github.luischavez.database.Migrator;
 
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
-public interface Example {
+public class MyMigrator extends Migrator {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(Example.class);
+    @Override
+    public void setup() {
+        this.register(new CreateUserTable());
+    }
 
-    public void execute(Database database);
+    public static class CreateUserTable implements Migration {
 
-    default public void log(String message, Object... args) {
-        LOGGER.debug(message, args);
+        @Override
+        public void up(Database database) {
+            database.create("users", table -> {
+                table.string("name", 32);
+                table.string("lastname", 32);
+            });
+        }
+
+        @Override
+        public void down(Database database) {
+            database.drop("users");
+        }
     }
 }

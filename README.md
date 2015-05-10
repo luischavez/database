@@ -1,5 +1,5 @@
 # Database access wrapper
-
+[ ![Download](https://api.bintray.com/packages/luischavez/maven/database/images/download.svg) ](https://bintray.com/luischavez/maven/database/_latestVersion)
 # Installation
 
 # Requeriments
@@ -9,28 +9,34 @@
 ## Configuration
 Configuration file example:
 ```xml
-<configurations>
-    <configuration>
-        <name>h2</name>
-        <support>com.github.luischavez.database.h2.H2Support</support>
-        <properties>
-            <database>database.h2</database>
-            <user>root</user>
-            <password>test</password>
-        </properties>
-    </configuration>
-    <configuration>
-        <name>mysql</name>
-        <support>com.github.luischavez.database.mysql.MySQLSupport</support>
-        <properties>
-            <server>localhost</server>
-            <database>example</database>
-            <port>3306</port>
-            <user>root</user>
-            <password></password>
-        </properties>
-    </configuration>
-</configurations>
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <databases>
+        <database>
+            <name>h2</name>
+            <support>com.github.luischavez.database.h2.H2Support</support>
+            <properties>
+                <item key="database" value="test.h2"/>
+                <item key="user" value="root"/>
+                <item key="password" value="test"/>
+            </properties>
+        </database>
+        <database>
+            <name>mysql</name>
+            <support>com.github.luischavez.database.mysql.MySQLSupport</support>
+            <properties>
+                <item key="server" value="localhost"/>
+                <item key="database" value="test"/>
+                <item key="port" value="3306"/>
+                <item key="user" value="root"/>
+                <item key="password" value=""/>
+            </properties>
+        </database>
+    </databases>
+    <migrators>
+        <migrator>com.github.luischavez.database.examples.MyMigrator</migrator>
+    </migrators>
+</configuration>
 ```
 ### Local source
 Local source configuration should be placed on the project working directory.
@@ -59,49 +65,49 @@ mysql.close();
 ```
 ### Query first result
 ```java
-Row row = mysql.query("users").first();
+Row row = mysql.table("users").first();
 ```
 ### Query multiple results
 ```java
-RowList rows = mysql.query("users").get();
+RowList rows = mysql.table("users").get();
 ```
 ### Select columns
 ```java
-Row row = mysql.query("users").first("name, lastname");
-RowList rows = mysql.query("users").get("name");
+Row row = mysql.table("users").first("name, lastname");
+RowList rows = mysql.table("users").get("name");
 ```
 ### Where clauses
 ```java
-Row row = mysql.query("users").where("name", "=", "Luis").first();
+Row row = mysql.table("users").where("name", "=", "Luis").first();
 ```
 Multiple where clauses
 ```java
-Row row = mysql.query("users")
+Row row = mysql.table("users")
                 .where("name", "=", "Luis")
                 .orWhere("name", "=", "Walter")
                 .first();
 ```
 ### Having clauses
 ```java
-Row row = mysql.query("users").having("name", "=", "Luis").first();
+Row row = mysql.table("users").having("name", "=", "Luis").first();
 ```
 Multiple having clauses
 ```java
-Row row = mysql.query("users")
+Row row = mysql.table("users")
                 .having("name", "=", "Luis")
                 .orHaving("name", "=", "Walter")
                 .first();
 ```
 ### Join clauses
 ```java
-Row row = mysql.query("users u")
+Row row = mysql.table("users u")
                 .where("u.name", "=", "Luis")
                 .join("profiles p", "p.user_id", "=", "u.user_id")
                 .first();
 ```
 Multiple join filters
 ```java
-Row row = mysql.query("users u")
+Row row = mysql.table("users u")
                 .where("u.name", "=", "Luis")
                 .join("profiles p", join -> {
                     join.on("p.user_id", "=", "u.user_id")
@@ -111,30 +117,30 @@ Row row = mysql.query("users u")
 ```
 ### Groups
 ```java
-RowList rows = mysql.query("users")
+RowList rows = mysql.table("users")
                     .group("user_type")
                     .get("user_type, name, lastname");
 ```
 ### Ordering results
 Asc order
 ```java
-RowList rows = mysql.query("users")
+RowList rows = mysql.table("users")
                     .order("name", true);
                     .get("name");
 ```
 Desc order
 ```java
-RowList rows = mysql.query("users")
+RowList rows = mysql.table("users")
                     .order("name", false);
                     .get("name");
 ```
 ### Limit results
 ```java
-RowList rows = mysql.query("users").limit(10).get();
+RowList rows = mysql.table("users").limit(10).get();
 ```
 Offset support
 ```java
-RowList rows = mysql.query("users").limit(10).offset(5).get();
+RowList rows = mysql.table("users").limit(10).offset(5).get();
 ```
 ## Insert
 Insert one row
@@ -225,6 +231,49 @@ mysql.drop("users");
 ```java
 if (mysql.exists("users")) {
 }
+```
+## Migrations
+Define migrations
+```java
+public class CreateUsersTable implements Migration {
+    @Override
+    public void up(Database database) {
+        database.create("users", table -> {
+            table.string("name", 32);
+            table.string("lastname", 32);
+        });
+    }
+    @Override
+    public void down(Database database) {
+        database.drop("users");
+    }
+}
+```
+Create custom migrator
+```java
+public class MyMigrator extends Migrator {
+    @Override
+    public void setup() {
+        this.register(new CreateUsersTable());
+    }
+}
+```
+Configuration
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <migrators>
+        <migrator>com.github.luischavez.database.examples.MyMigrator</migrator>
+    </migrators>
+</configuration>
+```
+### Migrate
+```java
+mysql.migrate();
+```
+### Rollback
+```java
+mysql.rollback();
 ```
 # Authors
 - Luis Chávez <https://github.com/luischavez>

@@ -18,7 +18,7 @@ package com.github.luischavez.database.link;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class LinkerException extends RuntimeException {
 

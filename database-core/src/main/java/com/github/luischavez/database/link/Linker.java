@@ -16,15 +16,15 @@
  */
 package com.github.luischavez.database.link;
 
-import com.github.luischavez.database.configuration.Configuration;
+import com.github.luischavez.database.configuration.DatabaseConfiguration;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public interface Linker {
 
-    public void configure(Configuration configuration);
+    public void configure(DatabaseConfiguration configuration);
 
     public Link open();
 

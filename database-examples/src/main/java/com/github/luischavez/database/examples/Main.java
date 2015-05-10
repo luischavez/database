@@ -25,12 +25,13 @@ import java.util.List;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class Main {
 
     private static final String[] DATABASES = {
-        "mysql", "h2"
+        "mysql",
+        "h2"
     };
 
     private static final List<Example> EXAMPLES = new ArrayList<>();
@@ -39,6 +40,7 @@ public class Main {
         EXAMPLES.add(new BasicExample());
         EXAMPLES.add(new ColumnTypeExample());
         EXAMPLES.add(new DatabaseExistExample());
+        EXAMPLES.add(new MigrationExample());
     }
 
     public static void main(String[] args) {

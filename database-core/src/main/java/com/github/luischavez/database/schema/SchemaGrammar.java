@@ -34,7 +34,7 @@ import java.util.List;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class SchemaGrammar extends Grammar {
 

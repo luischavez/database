@@ -18,7 +18,7 @@ package com.github.luischavez.database.configuration;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public interface ConfigurationSource {
 

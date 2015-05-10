@@ -20,7 +20,7 @@ import com.github.luischavez.database.query.QueryGrammar;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class MySQLQueryGrammar extends QueryGrammar {
 

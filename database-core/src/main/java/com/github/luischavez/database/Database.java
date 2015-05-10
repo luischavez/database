@@ -19,6 +19,7 @@ package com.github.luischavez.database;
 import com.github.luischavez.database.configuration.Configuration;
 import com.github.luischavez.database.configuration.ConfigurationBuilder;
 import com.github.luischavez.database.configuration.ConfigurationSource;
+import com.github.luischavez.database.configuration.DatabaseConfiguration;
 import com.github.luischavez.database.function.Fluentable;
 import com.github.luischavez.database.grammar.Compiler;
 import com.github.luischavez.database.grammar.Grammar;
@@ -40,27 +41,26 @@ import java.util.List;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class Database implements Queryable<Query> {
 
     private static final List<Database> DATABASES = new ArrayList<>();
+    private static final List<Migrator> MIGRATORS = new ArrayList<>();
 
-    private final Configuration configuration;
+    private final DatabaseConfiguration databaseConfiguration;
     private final Support support;
-    private final Migrator migrator;
 
     private Link link;
 
-    public Database(Configuration configuration, Support support) {
-        this.configuration = configuration;
+    public Database(DatabaseConfiguration databaseConfiguration, Support support) {
+        this.databaseConfiguration = databaseConfiguration;
         this.support = support;
-        this.migrator = new Migrator();
         this.link = null;
     }
 
     public void configure() {
-        this.support.linker().configure(this.configuration);
+        this.support.linker().configure(this.databaseConfiguration);
     }
 
     public void open() {
@@ -92,11 +92,15 @@ public class Database implements Queryable<Query> {
     }
 
     public void migrate() {
-        this.migrator.migrate(this);
+        for (Migrator migrator : Database.MIGRATORS) {
+            migrator.migrate(this);
+        }
     }
 
     public void rollback() {
-        this.migrator.rollback(this);
+        for (Migrator migrator : Database.MIGRATORS) {
+            migrator.rollback(this);
+        }
     }
 
     public Query query() {
@@ -258,37 +262,56 @@ public class Database implements Queryable<Query> {
 
     public static Database use(String name) {
         for (Database database : Database.DATABASES) {
-            if (name.equals(database.configuration.getName())) {
+            if (name.equals(database.databaseConfiguration.getName())) {
                 return database;
             }
         }
         throw new DatabaseException("Database not found " + name);
     }
 
-    public static void load(ConfigurationBuilder builder, ConfigurationSource source) {
+    private static <T> T createInstance(Class<T> type, String className) {
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException ex) {
+            throw new InvalidSupportClassException("Can't find class " + className, ex);
+        }
+        if (!type.isAssignableFrom(clazz)) {
+            throw new InvalidSupportClassException("Class " + className + " not implements " + type.getName());
+        }
+        Object object;
+        try {
+            object = clazz.newInstance();
+        } catch (IllegalAccessException | InstantiationException ex) {
+            throw new InvalidSupportClassException("Can't load class " + className, ex);
+        }
+        return type.cast(object);
+    }
+
+    private static void loadDatabases(Configuration configuration) {
         Database.DATABASES.clear();
-        List<Configuration> configurations = builder.build(source);
-        for (Configuration configuration : configurations) {
-            String supportClassName = configuration.getSupportClassName();
-            Class<?> supportClass;
-            try {
-                supportClass = Class.forName(supportClassName);
-            } catch (ClassNotFoundException ex) {
-                throw new InvalidSupportClassException("Can't find support class " + supportClassName, ex);
-            }
-            if (!Support.class.isAssignableFrom(supportClass)) {
-                throw new InvalidSupportClassException("Class " + supportClassName + " not implements Support");
-            }
-            Support support;
-            try {
-                Object newInstance = supportClass.newInstance();
-                support = Support.class.cast(newInstance);
-            } catch (IllegalAccessException | InstantiationException ex) {
-                throw new InvalidSupportClassException("Can't load support class " + supportClassName, ex);
-            }
-            Database database = new Database(configuration, support);
+        List<DatabaseConfiguration> databaseConfigurations = configuration.getDatabases();
+        for (DatabaseConfiguration databaseConfiguration : databaseConfigurations) {
+            Support support = Database.createInstance(Support.class, databaseConfiguration.getSupportClassName());
+            Database database = new Database(databaseConfiguration, support);
             database.configure();
             Database.DATABASES.add(database);
         }
+    }
+
+    private static void loadMigrators(Configuration configuration) {
+        Database.MIGRATORS.clear();
+        List<String> migrators = configuration.getMigrators();
+        for (String migratorClassName : migrators) {
+            Migrator migrator = Database.createInstance(Migrator.class, migratorClassName);
+            migrator.setup();
+            Database.MIGRATORS.add(migrator);
+        }
+    }
+
+    public static void load(ConfigurationBuilder builder, ConfigurationSource source) {
+        Configuration configuration = builder.build(source);
+        Database.loadDatabases(configuration);
+        Database.loadMigrators(configuration);
     }
 }

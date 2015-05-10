@@ -16,53 +16,47 @@
  */
 package com.github.luischavez.database.configuration;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
-public class Configuration implements Serializable {
+@XmlRootElement(name = "configuration")
+public class Configuration {
 
-    private static final long serialVersionUID = 1L;
+    private final List<DatabaseConfiguration> databases;
+    private final List<String> migrators;
 
-    private String name;
-
-    private String supportClassName;
-
-    private final Map<String, String> properties;
-
-    public Configuration(String name, String supportClassName, Map<String, String> properties) {
-        this.name = name;
-        this.supportClassName = supportClassName;
-        this.properties = new HashMap<>(properties);
+    public Configuration() {
+        this.databases = new ArrayList<>();
+        this.migrators = new ArrayList<>();
     }
 
-    public String getName() {
-        return this.name;
+    public List<DatabaseConfiguration> getDatabases() {
+        return databases;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @XmlElementWrapper(name = "databases")
+    @XmlElement(name = "database")
+    public void setDatabases(List<DatabaseConfiguration> databaseConfigurations) {
+        this.databases.clear();
+        this.databases.addAll(databaseConfigurations);
     }
 
-    public String getSupportClassName() {
-        return this.supportClassName;
+    public List<String> getMigrators() {
+        return migrators;
     }
 
-    public void setSupportClassName(String supportClassName) {
-        this.supportClassName = supportClassName;
-    }
-
-    public Map<String, String> getProperties() {
-        return this.properties;
-    }
-
-    public void setProperties(Map<String, String> properties) {
-        this.properties.clear();
-        this.properties.putAll(properties);
+    @XmlElementWrapper(name = "migrators")
+    @XmlElement(name = "migrator")
+    public void setMigrators(List<String> migrators) {
+        this.migrators.clear();
+        this.migrators.addAll(migrators);
     }
 }

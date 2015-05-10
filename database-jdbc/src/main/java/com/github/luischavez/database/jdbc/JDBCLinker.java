@@ -16,7 +16,7 @@
  */
 package com.github.luischavez.database.jdbc;
 
-import com.github.luischavez.database.configuration.Configuration;
+import com.github.luischavez.database.configuration.DatabaseConfiguration;
 import com.github.luischavez.database.link.Link;
 import com.github.luischavez.database.link.Linker;
 import com.github.luischavez.database.link.LinkerException;
@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public abstract class JDBCLinker implements Linker {
 
@@ -42,11 +42,11 @@ public abstract class JDBCLinker implements Linker {
         return new JDBCLink(connection);
     }
 
-    protected abstract DataSource createDataSource(Configuration configuration);
+    protected abstract DataSource createDataSource(DatabaseConfiguration databaseConfiguration);
 
     @Override
-    public void configure(Configuration configuration) {
-        this.dataSource = this.createDataSource(configuration);
+    public void configure(DatabaseConfiguration databaseConfiguration) {
+        this.dataSource = this.createDataSource(databaseConfiguration);
     }
 
     @Override
@@ -57,7 +57,6 @@ public abstract class JDBCLinker implements Linker {
         } catch (SQLException ex) {
             throw new LinkerException("Can't create link", ex);
         }
-
         return this.createLink(connection);
     }
 
@@ -66,9 +65,7 @@ public abstract class JDBCLinker implements Linker {
         if (!(link instanceof JDBCLink)) {
             throw new LinkerException("Invalid Link class " + link.getClass().getName());
         }
-
         JDBCLink jdbcLink = JDBCLink.class.cast(link);
-
         try {
             jdbcLink.getConnection().close();
         } catch (SQLException ex) {

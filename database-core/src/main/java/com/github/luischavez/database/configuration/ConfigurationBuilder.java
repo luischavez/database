@@ -16,13 +16,11 @@
  */
 package com.github.luischavez.database.configuration;
 
-import java.util.List;
-
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public interface ConfigurationBuilder {
 
-    public List<Configuration> build(ConfigurationSource source);
+    public Configuration build(ConfigurationSource source);
 }

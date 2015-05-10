@@ -18,7 +18,7 @@ package com.github.luischavez.database.grammar;
 
 /**
  *
- * @author Luis Chávez <https://github.com/luischavez>
+ * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public interface Component {
 
