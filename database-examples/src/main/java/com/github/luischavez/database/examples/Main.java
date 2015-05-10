@@ -30,7 +30,8 @@ import java.util.List;
 public class Main {
 
     private static final String[] DATABASES = {
-        "mysql", "h2"
+        "mysql",
+        "h2"
     };
 
     private static final List<Example> EXAMPLES = new ArrayList<>();

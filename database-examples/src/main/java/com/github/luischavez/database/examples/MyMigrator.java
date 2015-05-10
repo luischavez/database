@@ -27,11 +27,11 @@ import com.github.luischavez.database.Migrator;
 public class MyMigrator extends Migrator {
 
     @Override
-    protected void setup() {
+    public void setup() {
         this.register(new CreateUserTable());
     }
 
-    class CreateUserTable implements Migration {
+    public static class CreateUserTable implements Migration {
 
         @Override
         public void up(Database database) {

@@ -92,5 +92,5 @@ public abstract class Migrator {
         }
     }
 
-    protected abstract void setup();
+    public abstract void setup();
 }

@@ -306,6 +306,7 @@ public class Database implements Queryable<Query> {
         List<String> migrators = configuration.getMigrators();
         for (String migratorClassName : migrators) {
             Migrator migrator = Database.createInstance(Migrator.class, migratorClassName);
+            migrator.setup();
             Database.MIGRATORS.add(migrator);
         }
     }
