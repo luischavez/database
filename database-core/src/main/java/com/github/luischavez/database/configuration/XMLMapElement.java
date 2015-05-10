@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Luis Chávez <https://github.com/luischavez>
+ * Copyright (C) 2015 Luis Chávez {@literal <https://github.com/luischavez>}
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,24 @@
  */
 package com.github.luischavez.database.configuration;
 
+import javax.xml.bind.annotation.XmlAttribute;
+
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
-public interface ConfigurationBuilder {
+public class XMLMapElement {
 
-    public Configuration build(ConfigurationSource source);
+    @XmlAttribute
+    public String key;
+    @XmlAttribute
+    public String value;
+
+    private XMLMapElement() {
+    }
+
+    public XMLMapElement(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
 }

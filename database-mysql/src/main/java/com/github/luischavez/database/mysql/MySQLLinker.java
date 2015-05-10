@@ -16,8 +16,8 @@
  */
 package com.github.luischavez.database.mysql;
 
-import com.github.luischavez.database.configuration.Configuration;
 import com.github.luischavez.database.configuration.ConfigurationException;
+import com.github.luischavez.database.configuration.DatabaseConfiguration;
 import com.github.luischavez.database.jdbc.JDBCLinker;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
@@ -33,8 +33,8 @@ import javax.sql.DataSource;
 public class MySQLLinker extends JDBCLinker {
 
     @Override
-    public DataSource createDataSource(Configuration configuration) {
-        Map<String, String> properties = configuration.getProperties();
+    public DataSource createDataSource(DatabaseConfiguration databaseConfiguration) {
+        Map<String, String> properties = databaseConfiguration.getProperties();
         if (!properties.containsKey("server")) {
             throw new ConfigurationException("Undefined server property");
         }
@@ -47,7 +47,7 @@ public class MySQLLinker extends JDBCLinker {
         String server = properties.get("server");
         String database = properties.get("database");
         String user = properties.get("user");
-        String password = properties.get("password");
+        String password = properties.getOrDefault("password", "");
         MysqlConnectionPoolDataSource mysqlDataSource = new MysqlConnectionPoolDataSource();
         mysqlDataSource.setServerName(server);
         mysqlDataSource.setDatabaseName(database);

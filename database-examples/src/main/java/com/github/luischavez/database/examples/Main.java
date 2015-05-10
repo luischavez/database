@@ -39,6 +39,7 @@ public class Main {
         EXAMPLES.add(new BasicExample());
         EXAMPLES.add(new ColumnTypeExample());
         EXAMPLES.add(new DatabaseExistExample());
+        EXAMPLES.add(new MigrationExample());
     }
 
     public static void main(String[] args) {

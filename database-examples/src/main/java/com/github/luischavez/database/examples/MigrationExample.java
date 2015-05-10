@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Luis Chávez <https://github.com/luischavez>
+ * Copyright (C) 2015 Luis Chávez {@literal <https://github.com/luischavez>}
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,13 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.luischavez.database.configuration;
+package com.github.luischavez.database.examples;
+
+import com.github.luischavez.database.Database;
 
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
-public interface ConfigurationBuilder {
+public class MigrationExample implements Example {
 
-    public Configuration build(ConfigurationSource source);
+    @Override
+    public void execute(Database database) {
+        database.migrate();
+        database.rollback();
+    }
 }

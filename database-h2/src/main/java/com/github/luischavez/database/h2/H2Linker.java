@@ -16,8 +16,8 @@
  */
 package com.github.luischavez.database.h2;
 
-import com.github.luischavez.database.configuration.Configuration;
 import com.github.luischavez.database.configuration.ConfigurationException;
+import com.github.luischavez.database.configuration.DatabaseConfiguration;
 import com.github.luischavez.database.jdbc.JDBCLinker;
 
 import java.util.Map;
@@ -33,8 +33,8 @@ import org.h2.jdbcx.JdbcDataSource;
 public class H2Linker extends JDBCLinker {
 
     @Override
-    protected DataSource createDataSource(Configuration configuration) {
-        Map<String, String> properties = configuration.getProperties();
+    protected DataSource createDataSource(DatabaseConfiguration databaseConfiguration) {
+        Map<String, String> properties = databaseConfiguration.getProperties();
         if (!properties.containsKey("database")) {
             throw new ConfigurationException("Undefined database property");
         }

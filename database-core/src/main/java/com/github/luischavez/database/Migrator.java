@@ -19,24 +19,26 @@ package com.github.luischavez.database;
 import com.github.luischavez.database.link.Row;
 import com.github.luischavez.database.link.RowList;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import java.time.LocalDateTime;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
-public class Migrator {
+public abstract class Migrator {
+
+    private final List<Migration> migrations;
+
+    public Migrator() {
+        this.migrations = new ArrayList<>();
+    }
+
+    protected void register(Migration migration) {
+        this.migrations.add(migration);
+    }
 
     protected void createMigrationTable(Database database) {
         database.create("migrations", table -> {
@@ -64,41 +66,11 @@ public class Migrator {
         return migration;
     }
 
-    protected Migration[] load() {
-        Properties properties = new Properties();
-        try (InputStream inputStream = getClass().getResourceAsStream("/migrations.properties")) {
-            properties.load(inputStream);
-        } catch (IOException ex) {
-            throw new MigrationException("Can't load migrations", ex);
-        }
-        Map<Integer, Migration> migrations = new HashMap<>();
-        Set<String> keys = properties.stringPropertyNames();
-        for (String key : keys) {
-            Integer order;
-            try {
-                order = Integer.valueOf(key);
-            } catch (NumberFormatException ex) {
-                throw new MigrationException("Invalid key " + key);
-            }
-            String migrationClassName = properties.getProperty(key);
-            Migration migration = this.createInstace(migrationClassName);
-            migrations.put(order, migration);
-        }
-        List<Integer> sortedKeys = Arrays.asList(migrations.keySet().toArray(new Integer[0]));
-        Collections.sort(sortedKeys);
-        for (Integer sortedKey : sortedKeys) {
-            Migration migration = migrations.remove(sortedKey);
-            migrations.put(sortedKey, migration);
-        }
-        return migrations.values().toArray(new Migration[0]);
-    }
-
     public void migrate(Database database) {
         if (!database.exists("migrations")) {
             this.createMigrationTable(database);
         }
-        Migration[] migrations = this.load();
-        for (Migration migration : migrations) {
+        for (Migration migration : this.migrations) {
             Row row = database.table("migrations").where("migration", "=", migration.getClass().getName()).first();
             if (null == row) {
                 migration.up(database);
@@ -119,4 +91,6 @@ public class Migrator {
             database.where("migration", "=", migrationClassName).delete("migrations");
         }
     }
+
+    protected abstract void setup();
 }
