@@ -131,7 +131,8 @@ public class Blueprint implements Compilable {
 
     protected void createConstraint(String columnName, String constratinType, String constraintName) {
         ConstraintDefinition definition = new ConstraintDefinition(constratinType);
-        definition.setConstraintName(constraintName);
+        String fixedConstraintName = constraintName.replaceAll(" ", "").replaceAll(",", "_");
+        definition.setConstraintName(fixedConstraintName);
         CreateConstraintComponent createConstraintComponent = new CreateConstraintComponent(columnName, definition);
         this.componentBag.add(createConstraintComponent);
     }
