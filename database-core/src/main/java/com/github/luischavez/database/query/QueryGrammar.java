@@ -88,14 +88,6 @@ public class QueryGrammar extends Grammar {
         return this.alias(string);
     }
 
-    protected String[] split(String columns) {
-        String[] split = columns.split(",");
-        for (int i = 0; i < split.length; i++) {
-            split[i] = split[i].trim();
-        }
-        return split;
-    }
-
     protected String join(String[] columns) {
         StringBuilder builder = new StringBuilder();
         for (String column : columns) {

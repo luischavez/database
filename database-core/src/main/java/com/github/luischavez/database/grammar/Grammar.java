@@ -22,10 +22,6 @@ package com.github.luischavez.database.grammar;
  */
 public abstract class Grammar implements Compiler {
 
-    protected String wrap(String string) {
-        return String.format("%s", string);
-    }
-
     protected String glue(String union, String[] strings) {
         StringBuilder builder = new StringBuilder();
         for (String string : strings) {
@@ -38,6 +34,26 @@ public abstract class Grammar implements Compiler {
 
     protected String glue(String[] strings) {
         return this.glue(" ", strings);
+    }
+
+    protected String wrap(String string) {
+        return String.format("%s", string);
+    }
+
+    protected String wrap(String[] strings) {
+        String[] out = new String[strings.length];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = this.wrap(strings[i]);
+        }
+        return this.glue(",", out);
+    }
+
+    protected String[] split(String columns) {
+        String[] split = columns.split(",");
+        for (int i = 0; i < split.length; i++) {
+            split[i] = split[i].trim();
+        }
+        return split;
     }
 
     protected abstract String compile(SQLType type, ComponentBag componentBag, Bindings bindings);

@@ -124,9 +124,9 @@ public class SchemaGrammar extends Grammar {
                 "CONSTRAINT",
                 this.wrap(definition.getConstraintName()),
                 this.getConstraintTypeString(definition.getConstraintType()),
-                "(", this.wrap(columnName), ")",
+                "(", this.wrap(this.split(columnName)), ")",
                 "REFERENCES", this.wrap(foreign.getRelatedTableName()),
-                "(" + this.wrap(foreign.getRelatedColumnName()) + ")",
+                "(" + this.wrap(this.split(foreign.getRelatedColumnName())) + ")",
                 this.getOnDeleteString(foreign.getOnDelete()),
                 this.getOnUpdateString(foreign.getOnUpdate())
             });
@@ -135,7 +135,7 @@ public class SchemaGrammar extends Grammar {
             "CONSTRAINT",
             this.wrap(definition.getConstraintName()),
             this.getConstraintTypeString(definition.getConstraintType()),
-            "(", this.wrap(columnName), ")"
+            "(", this.wrap(this.split(columnName)), ")"
         });
     }
 
