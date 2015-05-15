@@ -43,7 +43,7 @@ public abstract class Migrator {
     protected void createMigrationTable(Database database) {
         database.create("migrations", table -> {
             table.text("migration");
-            table.timestamp("created_at");
+            table.dateTime("created_at");
         });
     }
 

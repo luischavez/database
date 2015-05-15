@@ -23,7 +23,6 @@ import com.github.luischavez.database.grammar.SQLType;
 import com.github.luischavez.database.link.Affecting;
 import com.github.luischavez.database.link.Link;
 import com.github.luischavez.database.link.RowList;
-import com.github.luischavez.database.link.Transform;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +37,10 @@ public class DefaultHandler implements Handler {
 
     private final Compiler compiler;
     private final Link link;
-    private final Transform transform;
 
-    public DefaultHandler(Compiler compiler, Link link, Transform transform) {
+    public DefaultHandler(Compiler compiler, Link link) {
         this.compiler = compiler;
         this.link = link;
-        this.transform = transform;
     }
 
     protected void log(String sql, Bindings bindings) {
@@ -69,7 +66,7 @@ public class DefaultHandler implements Handler {
         }
         String sql = this.compiler.compile(compilable);
         Bindings bindings = compilable.bindings();
-        RowList rows = this.link.select(sql, bindings, this.transform);
+        RowList rows = this.link.select(sql, bindings);
         this.log(sql, bindings);
         return rows;
     }
@@ -82,10 +79,10 @@ public class DefaultHandler implements Handler {
         Affecting affecting = null;
         switch (type) {
             case INSERT:
-                affecting = this.link.insert(sql, bindings, this.transform);
+                affecting = this.link.insert(sql, bindings);
                 break;
             case UPDATE:
-                affecting = this.link.update(sql, bindings, this.transform);
+                affecting = this.link.update(sql, bindings);
                 break;
             case DELETE:
                 affecting = this.link.delete(sql, bindings);

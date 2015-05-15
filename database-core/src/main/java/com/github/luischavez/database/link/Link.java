@@ -16,27 +16,130 @@
  */
 package com.github.luischavez.database.link;
 
+import com.github.luischavez.database.function.Transform;
 import com.github.luischavez.database.grammar.Bindings;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import java.nio.ByteBuffer;
+
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Date;
+import java.sql.NClob;
+import java.sql.Time;
+import java.sql.Timestamp;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import java.util.Map;
 
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
-public interface Link {
+public abstract class Link {
 
-    public RowList select(String sql, Bindings bindings, Transform transform);
+    protected <T> void apply(Bundle bundle, Class<T> type, Transform<T> transform) {
+        Object value = bundle.getValue();
+        Class<? extends Object> clazz = value.getClass();
+        if (type.isAssignableFrom(clazz)) {
+            Object transformed = transform.apply(type.cast(value));
+            bundle.setValue(transformed);
+        }
+    }
 
-    public Affecting insert(String sql, Bindings bindings, Transform transform);
+    protected Object toJava(Object value) {
+        if (null == value) {
+            return value;
+        }
+        Bundle bundle = new Bundle(value);
+        this.apply(bundle, Long.class, Transforms::same);
+        this.apply(bundle, BigInteger.class, Transforms::toLong);
+        this.apply(bundle, Integer.class, Transforms::toLong);
+        this.apply(bundle, Short.class, Transforms::toLong);
+        this.apply(bundle, BigDecimal.class, Transforms::same);
+        this.apply(bundle, Float.class, Transforms::toBigDecimal);
+        this.apply(bundle, Double.class, Transforms::toBigDecimal);
+        this.apply(bundle, String.class, Transforms::same);
+        this.apply(bundle, Clob.class, Transforms::toString);
+        this.apply(bundle, NClob.class, Transforms::toString);
+        this.apply(bundle, Character.class, Transforms::toString);
+        this.apply(bundle, Date.class, Transforms::toLocalDate);
+        this.apply(bundle, Time.class, Transforms::toLocalTime);
+        this.apply(bundle, Timestamp.class, Transforms::toLocalDateTime);
+        this.apply(bundle, Blob.class, Transforms::toByteBuffer);
+        this.apply(bundle, byte[].class, Transforms::toByteBuffer);
+        this.apply(bundle, Boolean.class, Transforms::same);
+        if (!bundle.modified()) {
+            throw new TransformException("Can't transform value " + value.getClass().getName() + " to java type");
+        }
+        return bundle.getValue();
+    }
 
-    public Affecting update(String sql, Bindings bindings, Transform transform);
+    protected Object toDatabase(Object value) {
+        if (null == value) {
+            return value;
+        }
+        Bundle bundle = new Bundle(value);
+        this.apply(bundle, Long.class, Transforms::same);
+        this.apply(bundle, BigInteger.class, Transforms::toLong);
+        this.apply(bundle, Integer.class, Transforms::toLong);
+        this.apply(bundle, Short.class, Transforms::toLong);
+        this.apply(bundle, BigDecimal.class, Transforms::same);
+        this.apply(bundle, Float.class, Transforms::toBigDecimal);
+        this.apply(bundle, Double.class, Transforms::toBigDecimal);
+        this.apply(bundle, String.class, Transforms::same);
+        this.apply(bundle, Clob.class, Transforms::toString);
+        this.apply(bundle, NClob.class, Transforms::toString);
+        this.apply(bundle, Character.class, Transforms::toString);
+        this.apply(bundle, LocalDate.class, Transforms::toDate);
+        this.apply(bundle, LocalTime.class, Transforms::toTime);
+        this.apply(bundle, LocalDateTime.class, Transforms::toTimestamp);
+        this.apply(bundle, ByteBuffer.class, Transforms::toBlob);
+        this.apply(bundle, byte[].class, Transforms::toBlob);
+        this.apply(bundle, Boolean.class, Transforms::same);
+        if (!bundle.modified()) {
+            throw new TransformException("Can't transform value " + value.getClass().getName() + " to database type");
+        }
+        return bundle.getValue();
+    }
 
-    public Affecting delete(String sql, Bindings bindings);
+    protected void toDatabase(Bindings bindings) {
+        if (null != bindings) {
+            Object[] values = bindings.getArray(new String[]{"values"});
+            for (int i = 0; i < values.length; i++) {
+                values[i] = this.toDatabase(values[i]);
+            }
+            bindings.remove("values");
+            bindings.set("values", values);
+        }
+    }
 
-    public void create(String sql);
+    protected Row toJava(Map<String, Object> values) {
+        Row row = new Row();
+        for (String key : values.keySet()) {
+            row.set(key, this.toJava(values.get(key)));
+        }
+        return row;
+    }
 
-    public void alter(String sql);
+    public abstract RowList select(String sql, Bindings bindings);
 
-    public void drop(String sql);
+    public abstract Affecting insert(String sql, Bindings bindings);
 
-    public boolean exists(String tableName);
+    public abstract Affecting update(String sql, Bindings bindings);
+
+    public abstract Affecting delete(String sql, Bindings bindings);
+
+    public abstract void create(String sql);
+
+    public abstract void alter(String sql);
+
+    public abstract void drop(String sql);
+
+    public abstract boolean exists(String tableName);
 }

@@ -1,6 +1,3 @@
 simplelogger.properties
 nb-configuration.xml
-database.xml
-/database-oracle/
-/database-orm/
 /target/

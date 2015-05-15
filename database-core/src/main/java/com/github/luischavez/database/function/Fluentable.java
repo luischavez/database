@@ -21,6 +21,7 @@ package com.github.luischavez.database.function;
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
  * @param <T>
  */
+@FunctionalInterface
 public interface Fluentable<T> {
 
     public void fluent(T t);

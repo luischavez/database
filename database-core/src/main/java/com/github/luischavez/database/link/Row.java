@@ -16,6 +16,14 @@
  */
 package com.github.luischavez.database.link;
 
+import java.math.BigDecimal;
+
+import java.nio.ByteBuffer;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +54,34 @@ public class Row {
     public <T extends Object> T value(String key, Class<T> type) {
         Object value = this.value(key);
         return null == value ? null : type.cast(value);
+    }
+
+    public Long number(String key) {
+        return this.value(key, Long.class);
+    }
+
+    public BigDecimal decimal(String key) {
+        return this.value(key, BigDecimal.class);
+    }
+
+    public String string(String key) {
+        return this.value(key, String.class);
+    }
+
+    public LocalDate date(String key) {
+        return this.value(key, LocalDate.class);
+    }
+
+    public LocalTime time(String key) {
+        return this.value(key, LocalTime.class);
+    }
+
+    public LocalDateTime dateTime(String key) {
+        return this.value(key, LocalDateTime.class);
+    }
+
+    public ByteBuffer bytes(String key) {
+        return this.value(key, ByteBuffer.class);
     }
 
     public String[] keys() {

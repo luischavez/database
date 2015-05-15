@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2015 Luis Chávez
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,17 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.luischavez.database.h2;
-
-import com.github.luischavez.database.Support;
+package com.github.luischavez.database.link;
 
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
-public class H2Support extends Support {
+public class Bundle {
 
-    public H2Support() {
-        super(new H2Linker(), new H2QueryGrammar(), new H2SchemaGrammar());
+    private Object value;
+    private boolean modified;
+
+    public Bundle(Object value) {
+        this.value = value;
+        this.modified = false;
+    }
+
+    public Object getValue() {
+        return this.value;
+    }
+
+    public void setValue(Object value) {
+        this.modified = true;
+        this.value = value;
+    }
+
+    public boolean modified() {
+        return modified;
     }
 }

@@ -16,6 +16,8 @@
  */
 package com.github.luischavez.database.schema.component;
 
+import com.github.luischavez.database.grammar.ConstraintType;
+
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
@@ -27,7 +29,7 @@ public class ForeignDefinition extends ConstraintDefinition {
     private final String onDelete;
     private final String onUpdate;
 
-    public ForeignDefinition(String constraintType, String relatedColumnName, String relatedTableName, String onDelete, String onUpdate) {
+    public ForeignDefinition(ConstraintType constraintType, String relatedColumnName, String relatedTableName, String onDelete, String onUpdate) {
         super(constraintType);
         this.relatedColumnName = relatedColumnName;
         this.relatedTableName = relatedTableName;

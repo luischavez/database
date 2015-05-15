@@ -21,6 +21,8 @@ import com.github.luischavez.database.link.Row;
 
 import java.math.BigDecimal;
 
+import java.nio.ByteBuffer;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -38,11 +40,12 @@ public class ColumnTypeExample implements Example {
             table.bool("boolean_column").defaults(true);
             table.date("date_column").defaults(LocalDate.now());
             table.time("time_column").defaults(LocalTime.now());
-            table.timestamp("datetime_column").defaults(LocalDateTime.now());
+            table.dateTime("datetime_column").defaults(LocalDateTime.now());
             table.string("string_column", 50).defaults("Luis");
             table.text("text_column");
             table.integer("integer_column", 10).unsigned().defaults(5);
             table.decimal("decimal_column", 10, 0).unsigned().defaults(BigDecimal.valueOf(10));
+            table.binary("binary_column");
         });
     }
 
@@ -54,7 +57,8 @@ public class ColumnTypeExample implements Example {
     public void execute(Database database) {
         this.createTables(database);
 
-        database.insert(TABLE_NAME, "text_column", "lorem ipsum etc etc");
+        database.insert(TABLE_NAME, "text_column, binary_column",
+                "lorem ipsum etc etc", ByteBuffer.wrap(new byte[]{0, 1, 1, 1, 0}));
 
         Row columns = database.table(TABLE_NAME).first();
         String[] keys = columns.keys();

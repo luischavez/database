@@ -55,7 +55,7 @@ public class BasicExample implements Example {
         database.table(USER_TABLE_NAME, table -> {
             table.drop("pass");
             table.string("password", 32).defaults("test");
-            table.timestamp("register_date").defaults(LocalDateTime.now());
+            table.dateTime("register_date").defaults(LocalDateTime.now());
 
             table.modify(columns -> columns.string("username", 50).defaults("modified"));
 

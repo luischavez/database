@@ -30,7 +30,6 @@ import com.github.luischavez.database.link.Affecting;
 import com.github.luischavez.database.link.Link;
 import com.github.luischavez.database.link.Row;
 import com.github.luischavez.database.link.RowList;
-import com.github.luischavez.database.link.Transform;
 import com.github.luischavez.database.query.Query;
 import com.github.luischavez.database.query.Queryable;
 import com.github.luischavez.database.query.component.JoinComponent;
@@ -81,8 +80,7 @@ public class Database implements Queryable<Query> {
         if (null == this.link) {
             throw new DatabaseException("Connection to database isn't open");
         }
-        Transform transform = this.support.transform();
-        return new DefaultHandler(compiler, this.link, transform);
+        return new DefaultHandler(compiler, this.link);
     }
 
     protected void schema(Blueprint blueprint) {

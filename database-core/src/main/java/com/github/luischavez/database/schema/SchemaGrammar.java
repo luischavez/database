@@ -17,8 +17,10 @@
 package com.github.luischavez.database.schema;
 
 import com.github.luischavez.database.grammar.Bindings;
+import com.github.luischavez.database.grammar.ColumnType;
 import com.github.luischavez.database.grammar.CompilerException;
 import com.github.luischavez.database.grammar.ComponentBag;
+import com.github.luischavez.database.grammar.ConstraintType;
 import com.github.luischavez.database.grammar.Grammar;
 import com.github.luischavez.database.grammar.SQLType;
 import com.github.luischavez.database.schema.component.ColumnDefinition;
@@ -38,12 +40,81 @@ import java.util.List;
  */
 public class SchemaGrammar extends Grammar {
 
-    protected String getColumnTypeString(String columnType) {
-        return columnType;
+    protected boolean supportsLength(ColumnType columnType) {
+        return true;
     }
 
-    protected String getConstraintTypeString(String constraintType) {
-        return constraintType;
+    protected boolean supportsUnsigned(ColumnType columnType) {
+        switch (columnType) {
+            case DECIMAL:
+            case INTEGER:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    protected boolean supportsIncrements(ColumnType columnType) {
+        switch (columnType) {
+            case INTEGER:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    protected boolean supportsNullable(ColumnType columnType) {
+        return true;
+    }
+
+    protected boolean supportsDefaults(ColumnType columnType) {
+        switch (columnType) {
+            case BINARY:
+            case TEXT:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    protected String getColumnTypeString(ColumnType columnType) {
+        switch (columnType) {
+            case BINARY:
+                return "BLOB";
+            case BOOLEAN:
+                return "BOOL";
+            case DATE:
+                return "DATE";
+            case DATE_TIME:
+                return "TIMESTAMP";
+            case DECIMAL:
+                return "DECIMAL";
+            case INTEGER:
+                return "INTEGER";
+            case STRING:
+                return "VARCHAR";
+            case TEXT:
+                return "TEXT";
+            case TIME:
+                return "TIME";
+            default:
+                throw new CompilerException("Unsupported column type " + columnType.name());
+        }
+    }
+
+    protected String getConstraintTypeString(ConstraintType constraintType) {
+        switch (constraintType) {
+            case FOREIGN_KEY:
+                return "FOREIGN KEY";
+            case INDEX:
+                return "INDEX";
+            case PRIMARY_KEY:
+                return "PRIMARY KEY";
+            case UNIQUE:
+                return "UNIQUE";
+            default:
+                throw new CompilerException("Unsupported constraint type " + constraintType.name());
+        }
     }
 
     protected String getLengthString(int length, int zeros) {
@@ -72,22 +143,28 @@ public class SchemaGrammar extends Grammar {
         if (null == defaultValue) {
             return "";
         }
-        if (defaultValue instanceof Boolean) {
-            Boolean bool = Boolean.class.cast(defaultValue);
-            return "DEFAULT '" + (bool ? "1" : "0") + "'";
+        if (defaultValue instanceof Number
+                || defaultValue instanceof Boolean) {
+            return "DEFAULT " + defaultValue;
         }
         return "DEFAULT '" + defaultValue.toString() + "'";
     }
 
     protected String getColumnString(String columnName, ColumnDefinition definition) {
+        ColumnType columnType = definition.getColumnType();
         return this.glue(new String[]{
             this.wrap(columnName),
             this.getColumnTypeString(definition.getColumnType()),
-            this.getLengthString(definition.getLength(), definition.getZeros()),
-            this.getUnsignedString(definition.isUnsigned()),
-            this.getNullableString(definition.isNullable()),
-            this.getAutoIncrementString(definition.isIncremented()),
-            this.getDefaultValueString(definition.getDefaultValue())
+            this.supportsLength(columnType)
+            ? this.getLengthString(definition.getLength(), definition.getZeros()) : "",
+            this.supportsUnsigned(columnType)
+            ? this.getUnsignedString(definition.isUnsigned()) : "",
+            this.supportsNullable(columnType)
+            ? this.getNullableString(definition.isNullable()) : "",
+            this.supportsIncrements(columnType)
+            ? this.getAutoIncrementString(definition.isIncremented()) : "",
+            this.supportsDefaults(columnType)
+            ? this.getDefaultValueString(definition.getDefaultValue()) : ""
         });
     }
 

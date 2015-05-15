@@ -16,22 +16,27 @@
  */
 package com.github.luischavez.database.schema.component;
 
+import com.github.luischavez.database.grammar.ConstraintType;
+
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class ConstraintDefinition {
 
-    private final String constraintType;
-
+    private ConstraintType constraintType;
     private String constraintName;
 
-    public ConstraintDefinition(String constraintType) {
+    public ConstraintDefinition(ConstraintType constraintType) {
         this.constraintType = constraintType;
     }
 
-    public String getConstraintType() {
+    public ConstraintType getConstraintType() {
         return this.constraintType;
+    }
+
+    public void setConstraintType(ConstraintType constraintType) {
+        this.constraintType = constraintType;
     }
 
     public String getConstraintName() {

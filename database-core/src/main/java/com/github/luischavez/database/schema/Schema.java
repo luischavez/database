@@ -16,6 +16,7 @@
  */
 package com.github.luischavez.database.schema;
 
+import com.github.luischavez.database.grammar.ColumnType;
 import com.github.luischavez.database.schema.component.ColumnDefinition;
 
 /**
@@ -27,7 +28,7 @@ public class Schema<T> {
 
     private final ColumnDefinition definition;
 
-    public Schema(String columnType) {
+    public Schema(ColumnType columnType) {
         this.definition = new ColumnDefinition(columnType);
     }
 

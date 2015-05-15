@@ -16,13 +16,15 @@
  */
 package com.github.luischavez.database.schema.component;
 
+import com.github.luischavez.database.grammar.ColumnType;
+
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
  */
 public class ColumnDefinition {
 
-    private String columnType;
+    private ColumnType columnType;
     private boolean nullable;
     private boolean unsigned;
     private boolean incremented;
@@ -30,15 +32,15 @@ public class ColumnDefinition {
     private int zeros;
     private Object defaultValue;
 
-    public ColumnDefinition(String columnType) {
+    public ColumnDefinition(ColumnType columnType) {
         this.columnType = columnType;
     }
 
-    public String getColumnType() {
+    public ColumnType getColumnType() {
         return columnType;
     }
 
-    public void setColumnType(String columnType) {
+    public void setColumnType(ColumnType columnType) {
         this.columnType = columnType;
     }
 

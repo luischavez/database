@@ -18,7 +18,6 @@ package com.github.luischavez.database;
 
 import com.github.luischavez.database.grammar.Grammar;
 import com.github.luischavez.database.link.Linker;
-import com.github.luischavez.database.link.Transform;
 
 /**
  *
@@ -29,13 +28,11 @@ public abstract class Support {
     private final Linker linker;
     private final Grammar queryGrammar;
     private final Grammar schemaGrammar;
-    private final Transform transform;
 
-    public Support(Linker linker, Grammar queryGrammar, Grammar schemaGrammar, Transform transform) {
+    public Support(Linker linker, Grammar queryGrammar, Grammar schemaGrammar) {
         this.linker = linker;
         this.queryGrammar = queryGrammar;
         this.schemaGrammar = schemaGrammar;
-        this.transform = transform;
     }
 
     public Linker linker() {
@@ -48,9 +45,5 @@ public abstract class Support {
 
     public Grammar schemaGrammar() {
         return this.schemaGrammar;
-    }
-
-    public Transform transform() {
-        return this.transform;
     }
 }

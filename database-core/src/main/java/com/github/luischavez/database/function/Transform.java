@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2015 Luis Chávez
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.luischavez.database.h2;
-
-import com.github.luischavez.database.Support;
+package com.github.luischavez.database.function;
 
 /**
  *
  * @author Luis Chávez {@literal <https://github.com/luischavez>}
+ * @param <T>
  */
-public class H2Support extends Support {
+@FunctionalInterface
+public interface Transform<T> {
 
-    public H2Support() {
-        super(new H2Linker(), new H2QueryGrammar(), new H2SchemaGrammar());
-    }
+    public Object apply(T value);
 }

@@ -17,7 +17,6 @@
 package com.github.luischavez.database.mysql;
 
 import com.github.luischavez.database.Support;
-import com.github.luischavez.database.jdbc.JDBCTransform;
 
 /**
  *
@@ -26,6 +25,6 @@ import com.github.luischavez.database.jdbc.JDBCTransform;
 public class MySQLSupport extends Support {
 
     public MySQLSupport() {
-        super(new MySQLLinker(), new MySQLQueryGrammar(), new MySQLSchemaGrammar(), new JDBCTransform());
+        super(new MySQLLinker(), new MySQLQueryGrammar(), new MySQLSchemaGrammar());
     }
 }

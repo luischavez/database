@@ -18,8 +18,10 @@ package com.github.luischavez.database.schema;
 
 import com.github.luischavez.database.function.Fluentable;
 import com.github.luischavez.database.grammar.Bindings;
+import com.github.luischavez.database.grammar.ColumnType;
 import com.github.luischavez.database.grammar.Compilable;
 import com.github.luischavez.database.grammar.ComponentBag;
+import com.github.luischavez.database.grammar.ConstraintType;
 import com.github.luischavez.database.grammar.SQLType;
 import com.github.luischavez.database.schema.component.ColumnDefinition;
 import com.github.luischavez.database.schema.component.ConstraintDefinition;
@@ -31,6 +33,8 @@ import com.github.luischavez.database.schema.component.ForeignDefinition;
 import com.github.luischavez.database.schema.component.SchemaTableComponent;
 
 import java.math.BigDecimal;
+
+import java.nio.ByteBuffer;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,11 +48,6 @@ import java.util.List;
  */
 public class Blueprint implements Compilable {
 
-    public static final String PRIMARY_KEY = "PRIMARY KEY";
-    public static final String UNIQUE = "UNIQUE";
-    public static final String INDEX = "index";
-    public static final String FOREIGN_KEY = "FOREIGN KEY";
-
     private final SQLType type;
     private final ComponentBag componentBag;
     private final Bindings bindings;
@@ -60,7 +59,7 @@ public class Blueprint implements Compilable {
         this.componentBag.add(new SchemaTableComponent(tableName));
     }
 
-    protected <T extends Object> Schema<T> createColumn(String columnName, String columnType, int length, int zeros) {
+    protected <T extends Object> Schema<T> createColumn(String columnName, ColumnType columnType, int length, int zeros) {
         Schema<T> schema = new Schema<>(columnType);
         ColumnDefinition definition = schema.getDefinition();
         definition.setLength(length);
@@ -69,40 +68,16 @@ public class Blueprint implements Compilable {
         return schema;
     }
 
-    protected <T extends Object> Schema<T> createColumn(String columnName, String columnType, int length) {
+    protected <T extends Object> Schema<T> createColumn(String columnName, ColumnType columnType, int length) {
         return this.createColumn(columnName, columnType, length, 0);
     }
 
-    protected <T extends Object> Schema<T> createColumn(String columnName, String columnType) {
+    protected <T extends Object> Schema<T> createColumn(String columnName, ColumnType columnType) {
         return this.createColumn(columnName, columnType, 0);
     }
 
-    public Schema<Boolean> bool(String columnName) {
-        return this.createColumn(columnName, "BOOL");
-    }
-
-    public Schema<LocalTime> time(String columnName) {
-        return this.createColumn(columnName, "TIME");
-    }
-
-    public Schema<LocalDate> date(String columnName) {
-        return this.createColumn(columnName, "DATE");
-    }
-
-    public Schema<LocalDateTime> timestamp(String columnName) {
-        return this.createColumn(columnName, "TIMESTAMP");
-    }
-
-    public Schema<String> string(String columnName, int length) {
-        return this.createColumn(columnName, "VARCHAR", length);
-    }
-
-    public Schema<String> text(String columnName) {
-        return this.createColumn(columnName, "TEXT");
-    }
-
     public Schema<Integer> integer(String columnName, int length) {
-        return this.createColumn(columnName, "INTEGER", length);
+        return this.createColumn(columnName, ColumnType.INTEGER, length);
     }
 
     public Schema<Integer> integer(String columnName) {
@@ -110,7 +85,35 @@ public class Blueprint implements Compilable {
     }
 
     public Schema<BigDecimal> decimal(String columnName, int length, int zeros) {
-        return this.createColumn(columnName, "DECIMAL", length, zeros);
+        return this.createColumn(columnName, ColumnType.DECIMAL, length, zeros);
+    }
+
+    public Schema<String> string(String columnName, int length) {
+        return this.createColumn(columnName, ColumnType.STRING, length);
+    }
+
+    public Schema<String> text(String columnName) {
+        return this.createColumn(columnName, ColumnType.TEXT);
+    }
+
+    public Schema<LocalDate> date(String columnName) {
+        return this.createColumn(columnName, ColumnType.DATE);
+    }
+
+    public Schema<LocalTime> time(String columnName) {
+        return this.createColumn(columnName, ColumnType.TIME);
+    }
+
+    public Schema<LocalDateTime> dateTime(String columnName) {
+        return this.createColumn(columnName, ColumnType.DATE_TIME);
+    }
+
+    public Schema<ByteBuffer> binary(String columnName) {
+        return this.createColumn(columnName, ColumnType.BINARY);
+    }
+
+    public Schema<Boolean> bool(String columnName) {
+        return this.createColumn(columnName, ColumnType.BOOLEAN);
     }
 
     public void modify(Fluentable<Blueprint> fluentable) {
@@ -129,7 +132,7 @@ public class Blueprint implements Compilable {
         this.componentBag.add(dropColumnComponent);
     }
 
-    protected void createConstraint(String columnName, String constratinType, String constraintName) {
+    protected void createConstraint(String columnName, ConstraintType constratinType, String constraintName) {
         ConstraintDefinition definition = new ConstraintDefinition(constratinType);
         String fixedConstraintName = constraintName.replaceAll(" ", "").replaceAll(",", "_");
         definition.setConstraintName(fixedConstraintName);
@@ -138,7 +141,7 @@ public class Blueprint implements Compilable {
     }
 
     public void primary(String columnName, String constraintName) {
-        this.createConstraint(columnName, PRIMARY_KEY, constraintName);
+        this.createConstraint(columnName, ConstraintType.PRIMARY_KEY, constraintName);
     }
 
     public void primary(String columnName) {
@@ -146,7 +149,7 @@ public class Blueprint implements Compilable {
     }
 
     public void unique(String columnName, String constraintName) {
-        this.createConstraint(columnName, UNIQUE, constraintName);
+        this.createConstraint(columnName, ConstraintType.UNIQUE, constraintName);
     }
 
     public void unique(String columnName) {
@@ -154,7 +157,7 @@ public class Blueprint implements Compilable {
     }
 
     public void index(String columnName, String constraintName) {
-        this.createConstraint(columnName, INDEX, constraintName);
+        this.createConstraint(columnName, ConstraintType.INDEX, constraintName);
     }
 
     public void index(String columnName) {
@@ -162,7 +165,7 @@ public class Blueprint implements Compilable {
     }
 
     public void foreign(String columnName, String constraintName, String relatedColumnName, String relatedTableName, String onDelete, String onUpdate) {
-        ForeignDefinition definition = new ForeignDefinition(FOREIGN_KEY, relatedColumnName, relatedTableName, onDelete, onUpdate);
+        ForeignDefinition definition = new ForeignDefinition(ConstraintType.FOREIGN_KEY, relatedColumnName, relatedTableName, onDelete, onUpdate);
         definition.setConstraintName(constraintName);
         CreateConstraintComponent createConstraintComponent = new CreateConstraintComponent(columnName, definition);
         this.componentBag.add(createConstraintComponent);
@@ -175,7 +178,7 @@ public class Blueprint implements Compilable {
         this.foreign(columnName, constraintName, relatedColumnName, relatedTableName, onDelete, onUpdate);
     }
 
-    protected void dropConstraint(String constraintType, String constraintName) {
+    protected void dropConstraint(ConstraintType constraintType, String constraintName) {
         ConstraintDefinition definition = new ConstraintDefinition(constraintType);
         definition.setConstraintName(constraintName);
         DropConstraintComponent dropConstraintComponent = new DropConstraintComponent(definition);
@@ -183,19 +186,19 @@ public class Blueprint implements Compilable {
     }
 
     public void dropPrimary() {
-        this.dropConstraint(PRIMARY_KEY, "");
+        this.dropConstraint(ConstraintType.PRIMARY_KEY, "");
     }
 
     public void dropUnique(String constraintName) {
-        this.dropConstraint(UNIQUE, constraintName);
+        this.dropConstraint(ConstraintType.UNIQUE, constraintName);
     }
 
     public void dropIndex(String constraintName) {
-        this.dropConstraint(INDEX, constraintName);
+        this.dropConstraint(ConstraintType.INDEX, constraintName);
     }
 
     public void dropForeign(String constraintName) {
-        this.dropConstraint(FOREIGN_KEY, constraintName);
+        this.dropConstraint(ConstraintType.FOREIGN_KEY, constraintName);
     }
 
     @Override
