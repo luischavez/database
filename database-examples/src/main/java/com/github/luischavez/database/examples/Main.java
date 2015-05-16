@@ -41,6 +41,7 @@ public class Main {
         EXAMPLES.add(new ColumnTypeExample());
         EXAMPLES.add(new DatabaseExistExample());
         EXAMPLES.add(new MigrationExample());
+        EXAMPLES.add(new SerializeExample());
     }
 
     public static void main(String[] args) {
