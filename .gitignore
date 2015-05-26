@@ -5,3 +5,4 @@ nb-configuration.xml
 /database-jdbc/target/
 /database-mysql/target/
 /database-h2/target/
+/database-examples/target/
