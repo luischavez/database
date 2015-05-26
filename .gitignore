@@ -1,3 +1,8 @@
 simplelogger.properties
 nb-configuration.xml
 /target/
+/database-core/target/
+/database-jdbc/target/
+/database-mysql/target/
+/database-h2/target/
+/database-examples/target/

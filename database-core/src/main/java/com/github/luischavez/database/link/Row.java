@@ -16,6 +16,11 @@
  */
 package com.github.luischavez.database.link;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+
 import java.math.BigDecimal;
 
 import java.nio.ByteBuffer;
@@ -82,6 +87,21 @@ public class Row {
 
     public ByteBuffer bytes(String key) {
         return this.value(key, ByteBuffer.class);
+    }
+
+    public <T extends Serializable> T object(String key, Class<T> type) {
+        T value = null;
+        ByteBuffer bytes = this.bytes(key);
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes.array());
+                ObjectInputStream inputStream = new ObjectInputStream(bais)) {
+            Object object = inputStream.readObject();
+            if (type.isAssignableFrom(object.getClass())) {
+                value = type.cast(object);
+            }
+        } catch (ClassNotFoundException | IOException ex) {
+            throw new TransformException("Can't deserialize " + key + " to " + type.getName(), ex);
+        }
+        return value;
     }
 
     public String[] keys() {

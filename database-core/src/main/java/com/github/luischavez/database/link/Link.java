@@ -16,8 +16,11 @@
  */
 package com.github.luischavez.database.link;
 
+import com.github.luischavez.database.function.Fluentable;
 import com.github.luischavez.database.function.Transform;
 import com.github.luischavez.database.grammar.Bindings;
+
+import java.io.Serializable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -44,6 +47,9 @@ import java.util.Map;
 public abstract class Link {
 
     protected <T> void apply(Bundle bundle, Class<T> type, Transform<T> transform) {
+        if (bundle.modified()) {
+            return;
+        }
         Object value = bundle.getValue();
         Class<? extends Object> clazz = value.getClass();
         if (type.isAssignableFrom(clazz)) {
@@ -52,60 +58,61 @@ public abstract class Link {
         }
     }
 
-    protected Object toJava(Object value) {
+    protected Object transform(Object value, Fluentable<Bundle> fluentable) {
         if (null == value) {
             return value;
         }
         Bundle bundle = new Bundle(value);
-        this.apply(bundle, Long.class, Transforms::same);
-        this.apply(bundle, BigInteger.class, Transforms::toLong);
-        this.apply(bundle, Integer.class, Transforms::toLong);
-        this.apply(bundle, Short.class, Transforms::toLong);
-        this.apply(bundle, BigDecimal.class, Transforms::same);
-        this.apply(bundle, Float.class, Transforms::toBigDecimal);
-        this.apply(bundle, Double.class, Transforms::toBigDecimal);
-        this.apply(bundle, String.class, Transforms::same);
-        this.apply(bundle, Clob.class, Transforms::toString);
-        this.apply(bundle, NClob.class, Transforms::toString);
-        this.apply(bundle, Character.class, Transforms::toString);
-        this.apply(bundle, Date.class, Transforms::toLocalDate);
-        this.apply(bundle, Time.class, Transforms::toLocalTime);
-        this.apply(bundle, Timestamp.class, Transforms::toLocalDateTime);
-        this.apply(bundle, Blob.class, Transforms::toByteBuffer);
-        this.apply(bundle, byte[].class, Transforms::toByteBuffer);
-        this.apply(bundle, Boolean.class, Transforms::same);
+        fluentable.fluent(bundle);
         if (!bundle.modified()) {
             throw new TransformException("Can't transform value " + value.getClass().getName() + " to java type");
         }
         return bundle.getValue();
     }
 
+    protected Object toJava(Object value) {
+        return this.transform(value, bundle -> {
+            this.apply(bundle, Long.class, Transforms::same);
+            this.apply(bundle, BigInteger.class, Transforms::toLong);
+            this.apply(bundle, Integer.class, Transforms::toLong);
+            this.apply(bundle, Short.class, Transforms::toLong);
+            this.apply(bundle, BigDecimal.class, Transforms::same);
+            this.apply(bundle, Float.class, Transforms::toBigDecimal);
+            this.apply(bundle, Double.class, Transforms::toBigDecimal);
+            this.apply(bundle, String.class, Transforms::same);
+            this.apply(bundle, Clob.class, Transforms::toString);
+            this.apply(bundle, NClob.class, Transforms::toString);
+            this.apply(bundle, Character.class, Transforms::toString);
+            this.apply(bundle, Date.class, Transforms::toLocalDate);
+            this.apply(bundle, Time.class, Transforms::toLocalTime);
+            this.apply(bundle, Timestamp.class, Transforms::toLocalDateTime);
+            this.apply(bundle, Blob.class, Transforms::toByteBuffer);
+            this.apply(bundle, byte[].class, Transforms::toByteBuffer);
+            this.apply(bundle, Boolean.class, Transforms::same);
+        });
+    }
+
     protected Object toDatabase(Object value) {
-        if (null == value) {
-            return value;
-        }
-        Bundle bundle = new Bundle(value);
-        this.apply(bundle, Long.class, Transforms::same);
-        this.apply(bundle, BigInteger.class, Transforms::toLong);
-        this.apply(bundle, Integer.class, Transforms::toLong);
-        this.apply(bundle, Short.class, Transforms::toLong);
-        this.apply(bundle, BigDecimal.class, Transforms::same);
-        this.apply(bundle, Float.class, Transforms::toBigDecimal);
-        this.apply(bundle, Double.class, Transforms::toBigDecimal);
-        this.apply(bundle, String.class, Transforms::same);
-        this.apply(bundle, Clob.class, Transforms::toString);
-        this.apply(bundle, NClob.class, Transforms::toString);
-        this.apply(bundle, Character.class, Transforms::toString);
-        this.apply(bundle, LocalDate.class, Transforms::toDate);
-        this.apply(bundle, LocalTime.class, Transforms::toTime);
-        this.apply(bundle, LocalDateTime.class, Transforms::toTimestamp);
-        this.apply(bundle, ByteBuffer.class, Transforms::toBlob);
-        this.apply(bundle, byte[].class, Transforms::toBlob);
-        this.apply(bundle, Boolean.class, Transforms::same);
-        if (!bundle.modified()) {
-            throw new TransformException("Can't transform value " + value.getClass().getName() + " to database type");
-        }
-        return bundle.getValue();
+        return this.transform(value, bundle -> {
+            this.apply(bundle, Long.class, Transforms::same);
+            this.apply(bundle, BigInteger.class, Transforms::toLong);
+            this.apply(bundle, Integer.class, Transforms::toLong);
+            this.apply(bundle, Short.class, Transforms::toLong);
+            this.apply(bundle, BigDecimal.class, Transforms::same);
+            this.apply(bundle, Float.class, Transforms::toBigDecimal);
+            this.apply(bundle, Double.class, Transforms::toBigDecimal);
+            this.apply(bundle, String.class, Transforms::same);
+            this.apply(bundle, Clob.class, Transforms::toString);
+            this.apply(bundle, NClob.class, Transforms::toString);
+            this.apply(bundle, Character.class, Transforms::toString);
+            this.apply(bundle, LocalDate.class, Transforms::toDate);
+            this.apply(bundle, LocalTime.class, Transforms::toTime);
+            this.apply(bundle, LocalDateTime.class, Transforms::toTimestamp);
+            this.apply(bundle, ByteBuffer.class, Transforms::toBlob);
+            this.apply(bundle, byte[].class, Transforms::toBlob);
+            this.apply(bundle, Serializable.class, Transforms::toBlob);
+            this.apply(bundle, Boolean.class, Transforms::same);
+        });
     }
 
     protected void toDatabase(Bindings bindings) {

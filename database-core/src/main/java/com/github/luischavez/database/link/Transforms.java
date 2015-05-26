@@ -17,8 +17,11 @@
 package com.github.luischavez.database.link;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Reader;
+import java.io.Serializable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -150,6 +153,18 @@ public class Transforms {
         try {
             blob = new SerialBlob(value);
         } catch (SQLException ex) {
+            throw new TransformException("Can't transform " + value.getClass().getName() + " to Blob", ex);
+        }
+        return blob;
+    }
+
+    public static Blob toBlob(Serializable value) {
+        Blob blob;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream outputStream = new ObjectOutputStream(baos)) {
+            outputStream.writeObject(value);
+            blob = new SerialBlob(baos.toByteArray());
+        } catch (SQLException | IOException ex) {
             throw new TransformException("Can't transform " + value.getClass().getName() + " to Blob", ex);
         }
         return blob;
