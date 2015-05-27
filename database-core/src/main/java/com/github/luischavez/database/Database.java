@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class Database implements Queryable<Query> {
 
-    private static final List<Database> DATABASES = new ArrayList<>();
+    private static final List<DatabaseConfiguration> CONFIGURATIONS = new ArrayList<>();
     private static final List<Migrator> MIGRATORS = new ArrayList<>();
 
     private final DatabaseConfiguration databaseConfiguration;
@@ -98,6 +98,12 @@ public class Database implements Queryable<Query> {
     public void rollback() {
         for (Migrator migrator : Database.MIGRATORS) {
             migrator.rollback(this);
+        }
+    }
+
+    public void reset() {
+        for (Migrator migrator : Database.MIGRATORS) {
+            migrator.reset(this);
         }
     }
 
@@ -258,15 +264,6 @@ public class Database implements Queryable<Query> {
         throw new UnsupportedOperationException("Use table method before fetch results");
     }
 
-    public static Database use(String name) {
-        for (Database database : Database.DATABASES) {
-            if (name.equals(database.databaseConfiguration.getName())) {
-                return database;
-            }
-        }
-        throw new DatabaseException("Database not found " + name);
-    }
-
     private static <T> T createInstance(Class<T> type, String className) {
         Class<?> clazz;
         try {
@@ -286,15 +283,25 @@ public class Database implements Queryable<Query> {
         return type.cast(object);
     }
 
-    private static void loadDatabases(Configuration configuration) {
-        Database.DATABASES.clear();
-        List<DatabaseConfiguration> databaseConfigurations = configuration.getDatabases();
-        for (DatabaseConfiguration databaseConfiguration : databaseConfigurations) {
-            Support support = Database.createInstance(Support.class, databaseConfiguration.getSupportClassName());
-            Database database = new Database(databaseConfiguration, support);
-            database.configure();
-            Database.DATABASES.add(database);
+    private static Database createDatabase(DatabaseConfiguration configuration) {
+        Support support = Database.createInstance(Support.class, configuration.getSupportClassName());
+        Database database = new Database(configuration, support);
+        database.configure();
+        return database;
+    }
+
+    public static Database use(String name) {
+        for (DatabaseConfiguration configuration : Database.CONFIGURATIONS) {
+            if (configuration.getName().equals(name)) {
+                return Database.createDatabase(configuration);
+            }
         }
+        throw new DatabaseException("Database not found " + name);
+    }
+
+    private static void loadDatabases(Configuration configuration) {
+        Database.CONFIGURATIONS.clear();
+        Database.CONFIGURATIONS.addAll(configuration.getDatabases());
     }
 
     private static void loadMigrators(Configuration configuration) {
