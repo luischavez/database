@@ -101,6 +101,12 @@ public class Database implements Queryable<Query> {
         }
     }
 
+    public void reset() {
+        for (Migrator migrator : Database.MIGRATORS) {
+            migrator.reset(this);
+        }
+    }
+
     public Query query() {
         Grammar grammar = this.support.queryGrammar();
         Handler handler = this.handle(grammar);

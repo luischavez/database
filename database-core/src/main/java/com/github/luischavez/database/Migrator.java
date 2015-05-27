@@ -20,6 +20,7 @@ import com.github.luischavez.database.link.Row;
 import com.github.luischavez.database.link.RowList;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,9 @@ public abstract class Migrator {
             this.createMigrationTable(database);
         }
         for (Migration migration : this.migrations) {
-            Row row = database.table("migrations").where("migration", "=", migration.getClass().getName()).first();
+            Row row = database.table("migrations")
+                    .where("migration", "=", migration.getClass().getName())
+                    .first();
             if (null == row) {
                 migration.up(database);
                 database.insert("migrations", "migration, created_at", migration.getClass().getName(), LocalDateTime.now());
@@ -79,17 +82,39 @@ public abstract class Migrator {
         }
     }
 
-    public void rollback(Database database) {
-        if (!database.exists("migrations")) {
-            return;
-        }
-        RowList rows = database.table("migrations").order("created_at", false).get();
+    protected void downAll(Database database, RowList rows) {
         for (Row row : rows) {
             Object migrationClassName = row.value("migration");
             Migration migration = this.createInstace(migrationClassName.toString());
             migration.down(database);
-            database.where("migration", "=", migrationClassName).delete("migrations");
+            database.where("migration", "=", migrationClassName)
+                    .delete("migrations");
         }
+    }
+
+    public void rollback(Database database) {
+        if (!database.exists("migrations")) {
+            return;
+        }
+        Row lastMigration = database.table("migrations")
+                .order("created_at", false)
+                .first();
+        LocalDateTime createdAt = lastMigration.dateTime("created_at");
+        RowList rows = database.table("migrations")
+                .where("created_at", "=", createdAt.format(DateTimeFormatter.ISO_DATE_TIME))
+                .order("created_at", false)
+                .get();
+        this.downAll(database, rows);
+    }
+
+    public void reset(Database database) {
+        if (!database.exists("migrations")) {
+            return;
+        }
+        RowList rows = database.table("migrations")
+                .order("created_at", false)
+                .get();
+        this.downAll(database, rows);
     }
 
     public abstract void setup();
