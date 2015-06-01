@@ -29,6 +29,7 @@ public class MyMigrator extends Migrator {
     @Override
     public void setup() {
         this.register(new CreateUserTable());
+        this.register(new CreateProfileTable());
     }
 
     public static class CreateUserTable implements Migration {
@@ -36,14 +37,38 @@ public class MyMigrator extends Migrator {
         @Override
         public void up(Database database) {
             database.create("users", table -> {
-                table.string("name", 32);
-                table.string("lastname", 32);
+                table.integer("user_id").incremented();
+                table.string("username", 32);
+                table.string("password", 32);
+
+                table.primary("user_id");
             });
         }
 
         @Override
         public void down(Database database) {
             database.drop("users");
+        }
+    }
+
+    public static class CreateProfileTable implements Migration {
+
+        @Override
+        public void up(Database database) {
+            database.create("profiles", table -> {
+                table.integer("profile_id").incremented();
+                table.integer("user_id");
+                table.string("first_name", 32);
+                table.string("last_name", 32);
+
+                table.primary("profile_id");
+                table.foreign("user_id", "users", "user_id", "CASCADE", "CASCADE");
+            });
+        }
+
+        @Override
+        public void down(Database database) {
+            database.drop("profiles");
         }
     }
 }

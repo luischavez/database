@@ -17,6 +17,7 @@
 package com.github.luischavez.database.examples;
 
 import com.github.luischavez.database.Database;
+import com.github.luischavez.database.link.Affecting;
 
 /**
  *
@@ -26,7 +27,13 @@ public class MigrationExample implements Example {
 
     @Override
     public void execute(Database database) {
+        database.reset();
         database.migrate();
+        Affecting insert = database.insert("users", "username, password", "test", "test");
+        if (insert.success()) {
+            Object userId = insert.getGeneratedKeys()[0];
+            database.insert("profiles", "user_id, first_name, last_name", userId, "Luis", "Chávez");
+        }
         database.rollback();
     }
 }

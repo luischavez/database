@@ -31,6 +31,8 @@ import java.util.List;
  */
 public abstract class Migrator {
 
+    public static final String MIGRATIONS_TABLE = "migrations";
+
     private final List<Migration> migrations;
 
     public Migrator() {
@@ -42,9 +44,10 @@ public abstract class Migrator {
     }
 
     protected void createMigrationTable(Database database) {
-        database.create("migrations", table -> {
+        database.create(MIGRATIONS_TABLE, table -> {
             table.text("migration");
             table.dateTime("created_at");
+            table.integer("number");
         });
     }
 
@@ -68,16 +71,19 @@ public abstract class Migrator {
     }
 
     public void migrate(Database database) {
-        if (!database.exists("migrations")) {
+        if (!database.exists(MIGRATIONS_TABLE)) {
             this.createMigrationTable(database);
         }
+        LocalDateTime now = LocalDateTime.now();
+        long number = 1;
         for (Migration migration : this.migrations) {
-            Row row = database.table("migrations")
+            Row row = database.table(MIGRATIONS_TABLE)
                     .where("migration", "=", migration.getClass().getName())
                     .first();
             if (null == row) {
                 migration.up(database);
-                database.insert("migrations", "migration, created_at", migration.getClass().getName(), LocalDateTime.now());
+                database.insert(MIGRATIONS_TABLE, "migration, created_at, number",
+                        migration.getClass().getName(), now, number++);
             }
         }
     }
@@ -88,31 +94,45 @@ public abstract class Migrator {
             Migration migration = this.createInstace(migrationClassName.toString());
             migration.down(database);
             database.where("migration", "=", migrationClassName)
-                    .delete("migrations");
+                    .delete(MIGRATIONS_TABLE);
         }
     }
 
-    public void rollback(Database database) {
-        if (!database.exists("migrations")) {
-            return;
+    protected LocalDateTime lastMigrationDateTime(Database database) {
+        if (!database.exists(MIGRATIONS_TABLE)) {
+            return null;
         }
-        Row lastMigration = database.table("migrations")
+        Row lastMigration = database.table(MIGRATIONS_TABLE)
                 .order("created_at", false)
                 .first();
-        LocalDateTime createdAt = lastMigration.dateTime("created_at");
-        RowList rows = database.table("migrations")
-                .where("created_at", "=", createdAt.format(DateTimeFormatter.ISO_DATE_TIME))
-                .order("created_at", false)
+        if (null == lastMigration) {
+            return null;
+        }
+        return lastMigration.dateTime("created_at");
+    }
+
+    public void rollback(Database database) {
+        if (!database.exists(MIGRATIONS_TABLE)) {
+            return;
+        }
+        LocalDateTime lastMigrationDateTime = this.lastMigrationDateTime(database);
+        if (null == lastMigrationDateTime) {
+            return;
+        }
+        RowList rows = database.table(MIGRATIONS_TABLE)
+                .where("created_at", "=", lastMigrationDateTime.format(DateTimeFormatter.ISO_DATE_TIME))
+                .order("number", false)
                 .get();
         this.downAll(database, rows);
     }
 
     public void reset(Database database) {
-        if (!database.exists("migrations")) {
+        if (!database.exists(MIGRATIONS_TABLE)) {
             return;
         }
-        RowList rows = database.table("migrations")
+        RowList rows = database.table(MIGRATIONS_TABLE)
                 .order("created_at", false)
+                .order("number", false)
                 .get();
         this.downAll(database, rows);
     }
